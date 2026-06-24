@@ -70,7 +70,7 @@
 
   /* ── Tab ── */
   .tabs {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    display: grid; grid-template-columns: repeat(4, 1fr);
     border: 1px solid var(--border-m);
     border-radius: 6px; overflow: hidden;
     margin-bottom: 24px;
@@ -385,6 +385,7 @@
     <button class="tab-btn active" onclick="switchTab('out', this)">去程</button>
     <button class="tab-btn" onclick="switchTab('ret', this)">回程</button>
     <button class="tab-btn" onclick="switchTab('hotel', this)">住宿</button>
+    <button class="tab-btn" onclick="switchTab('expo', this)">布展資訊</button>
   </div>
 
   <!-- ════ 去程 ════ -->
@@ -557,9 +558,9 @@
           <div class="rec-tag" style="background:var(--dust-bg);color:var(--dust);border-color:rgba(201,169,122,.4);">最快抵達 · 約 16:30 到</div>
         </div>
         <div class="oh-right">
-          <div class="oh-price">約 NT$4,800</div>
+          <div class="oh-price">約 NT$10,000＋</div>
           <div class="oh-unit">/ 人 · 機票+火車</div>
-          <div class="price-warn">比巴士貴約 NT$3,700 / 人</div>
+          <div class="price-warn">比巴士貴約 NT$9,000＋ / 人</div>
         </div>
       </div>
       <div class="opt-body">
@@ -578,8 +579,8 @@
           <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
           <div class="cc">
             <div class="ev sky">
-              <div class="ev-title">LOT PRG → 華沙 WAW</div>
-              <div class="ev-desc">飛行 1h15．建議搭 12:45<br>（09:55 那班來不及銜接）</div>
+              <div class="ev-title">LOT Polish Airlines LO528</div>
+              <div class="ev-desc">布拉格 12:45 → 華沙 14:00（飛行 1h15）<br>含手提 8kg、托運 23kg．機票約 NT$10,000＋ / 人</div>
             </div>
           </div>
         </div>
@@ -640,7 +641,7 @@
     </div>
 
     <div class="notice">
-      <b>怎麼選：</b>最省 → <b>方案 2</b>（巴士直達，€31 / 人，21:25 到）；想第一天就到、不在意多花約 NT$3,700 / 人 → <b>方案 3</b>（轉華沙，約 16:30 到）。方案 1 繞道都柏林，最不划算。
+      <b>怎麼選：</b>最省 → <b>方案 2</b>（巴士直達，€31 / 人，21:25 到）；想第一天就到、不在意多花約 NT$9,000＋ / 人 → <b>方案 3</b>（轉華沙，約 16:30 到）。方案 1 繞道都柏林，最不划算。
     </div>
 
   </div>
@@ -861,6 +862,73 @@
 
     <div class="notice sage-notice" style="margin-top:16px;">
       <b>提醒：</b>所有住宿皆可退訂。9/14 中午 12:00 前退房，行李可寄放前台，20:30 取回出發。
+    </div>
+
+  </div>
+
+  <!-- ════ 布展資訊 ════ -->
+  <div class="panel" id="panel-expo">
+
+    <div class="sec-title">市集布展 · 9/11（五）· Łódź</div>
+
+    <div class="opt-card" style="border-color:rgba(196,137,122,.4);">
+      <div class="opt-head" style="background:var(--blush-bg);border-bottom-color:rgba(196,137,122,.3);">
+        <div class="oh-left">
+          <div class="opt-tag" style="background:var(--blush);color:var(--cream);">市集當天</div>
+          <div class="oh-type" style="color:#7A3E30;">9/11（五）</div>
+          <div class="oh-name">市集活動 12:00 – 20:00</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price" style="color:#7A3E30;">8h</div>
+          <div class="oh-unit">營業時段</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">10:00</div><div class="tc-n">進場</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">品牌進場佈置</div>
+              <div class="ev-desc">10:00–11:30 進場、佈置攤位</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">11:40</div><div class="tc-n">就位</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">完成佈置就位</div>
+              <div class="ev-desc"><b>11:40 前</b>須全部佈置完成、準備營業</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">12:00</div><div class="tc-n">開始</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">市集活動開始</div>
+              <div class="ev-desc">12:00–20:00 對外營業，共 8 小時</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">20:00</div><div class="tc-n">撤場</div></div>
+          <div class="lc"><div class="dot d-blush"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">撤場</div>
+              <div class="ev-desc">20:00–22:00 收攤、撤場完成</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice" style="background:var(--blush-bg);border-left-color:var(--blush);">
+      <b>時程重點：</b>10:00 進場 → <b>11:40 前就位</b> → 12:00–20:00 營業 → 20:00–22:00 撤場。
     </div>
 
   </div>
