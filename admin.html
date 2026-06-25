@@ -28,10 +28,14 @@
   a{color:var(--sage);}
   .dl{font-size:11px;margin-top:3px;text-align:center;}
   .thumb{cursor:zoom-in;}
-  #lb{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out;}
+  #lb{position:fixed;inset:0;background:rgba(42,37,32,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
   #lb.on{display:flex;}
-  #lb img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
-  #lb .lbx{position:fixed;top:14px;right:18px;color:rgba(255,255,255,.85);font-size:13px;}
+  .lb-box{position:relative;background:var(--cream);border-radius:12px;padding:12px;box-shadow:0 12px 50px rgba(0,0,0,.35);}
+  #lb-img{display:block;max-width:min(82vw,520px);max-height:74vh;border-radius:6px;}
+  .lb-x{position:absolute;top:-12px;right:-12px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-size:15px;line-height:30px;text-align:center;cursor:pointer;}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.94);color:var(--ink);font-size:23px;line-height:37px;text-align:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.22);user-select:none;}
+  .lb-prev{left:-14px;} .lb-next{right:-14px;}
+  .lb-count{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;}
 </style>
 </head>
 <body>
@@ -133,15 +137,26 @@ function showPhotos(i){
   var a=$('pl-'+i); a.textContent='載入中…';
   rpc('booth_admin_photos',{admin_password:PW,p_email:ROWS[i].email}).then(function(r){
     if(!r||!r.ok){a.textContent='載入失敗';return;}
-    var photos=r.photos||[]; var brand=(r.brand||'品牌');
-    var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="#" onclick="return openLb(this)"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
+    var photos=r.photos||[]; var brand=(r.brand||'品牌'); PSETS[i]=photos;
+    var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="#" onclick="return openLb('+i+','+k+')"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
     $('ph-'+i).innerHTML=h; a.style.display='none';
   }).catch(function(){a.textContent='載入失敗';});
   return false;
 }
-function openLb(a){var img=a.querySelector('img');if(!img)return false;$('lb-img').src=img.src;$('lb').classList.add('on');return false;}
+var PSETS={},LBset=[],LBidx=0;
+function openLb(i,k){LBset=PSETS[i]||[];LBidx=k;showLb();return false;}
+function showLb(){if(!LBset.length)return;$('lb-img').src=LBset[LBidx];$('lb-count').textContent=(LBidx+1)+' / '+LBset.length;var multi=LBset.length>1;document.querySelector('.lb-prev').style.display=multi?'block':'none';document.querySelector('.lb-next').style.display=multi?'block':'none';$('lb').classList.add('on');}
+function navLb(d){if(!LBset.length)return;LBidx=(LBidx+d+LBset.length)%LBset.length;showLb();}
 function closeLb(){$('lb').classList.remove('on');$('lb-img').src='';}
 </script>
-<div id="lb" onclick="closeLb()"><span class="lbx">✕ 點任意處關閉</span><img id="lb-img" alt=""></div>
+<div id="lb" onclick="closeLb()">
+  <div class="lb-box" onclick="event.stopPropagation()">
+    <span class="lb-x" onclick="closeLb()">✕</span>
+    <span class="lb-nav lb-prev" onclick="navLb(-1)">‹</span>
+    <img id="lb-img" alt="">
+    <span class="lb-nav lb-next" onclick="navLb(1)">›</span>
+    <div class="lb-count" id="lb-count"></div>
+  </div>
+</div>
 </body>
 </html>
