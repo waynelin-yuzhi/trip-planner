@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Łódź 行程 · 2026.09</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* 大地色系 — 蒸餾好好 x 好好手感 */
+    --paper:    #F5F0E8;
+    --cream:    #FEFCF7;
+    --linen:    #EDE8DE;
+    --stone:    #D8D2C6;
+    --ash:      #B8B2A6;
+    --ink:      #2A2520;
+    --ink-mid:  #5A534C;
+    --ink-soft: #8C857C;
+
+    /* 低彩點綴 */
+    --sage:     #8BA888;
+    --sage-bg:  #EFF4EE;
+    --dust:     #C9A97A;
+    --dust-bg:  #FAF3E8;
+    --blush:    #C4897A;
+    --blush-bg: #FAF0EE;
+    --sky:      #7A9BB4;
+    --sky-bg:   #EDF2F7;
+
+    --border:   rgba(90,83,76,.12);
+    --border-m: rgba(90,83,76,.22);
+  }
+
+  html { font-size: 15px; }
+
+  body {
+    background: var(--paper);
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink);
+    line-height: 1.7;
+    padding: 24px 16px 72px;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 420px; margin: 0 auto; }
+
+  /* ── 頁首 ── */
+  .pg-hd {
+    text-align: center;
+    padding: 20px 0 24px;
+    border-bottom: 1px solid var(--border-m);
+    margin-bottom: 28px;
+  }
+  .pg-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ash); margin-bottom: 10px;
+  }
+  .pg-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px; font-weight: 300; letter-spacing: .06em;
+    color: var(--ink); margin-bottom: 6px;
+  }
+  .pg-sub {
+    font-size: 11px; color: var(--ink-soft); letter-spacing: .04em;
+  }
+
+  /* ── Tab ── */
+  .tabs-bar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--paper);
+    padding: 12px 0; margin-bottom: 14px;
+  }
+  .tabs {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--border-m);
+    border-radius: 6px; overflow: hidden;
+  }
+  .tab-btn {
+    padding: 10px 4px;
+    background: var(--cream); border: none;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px; font-weight: 400; color: var(--ink-soft);
+    cursor: pointer; letter-spacing: .04em;
+    border-right: 1px solid var(--border-m);
+    transition: all .18s;
+  }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn.active {
+    background: var(--ink); color: var(--cream);
+    font-weight: 500;
+  }
+
+  /* ── Panel ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── 區段標題 ── */
+  .sec-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--ash); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sec-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── 班機卡 ── */
+  .flight-card {
+    background: var(--ink);
+    border-radius: 10px; padding: 18px 18px 14px;
+    margin-bottom: 20px;
+  }
+  .fc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase;
+    color: rgba(255,255,255,.4); margin-bottom: 12px;
+  }
+  .fc-route {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .fc-city { flex: 1; }
+  .fc-time {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 28px; font-weight: 300; color: #fff; line-height: 1;
+  }
+  .fc-loc { font-size: 10px; color: rgba(255,255,255,.45); margin-top: 3px; }
+  .fc-date { font-size: 9.5px; color: rgba(255,255,255,.3); margin-top: 1px; }
+  .fc-city.r { text-align: right; }
+  .fc-mid { text-align: center; }
+  .fc-dur {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: rgba(255,255,255,.3); margin-bottom: 4px;
+  }
+  .fc-line {
+    display: flex; align-items: center; gap: 3px;
+  }
+  .fc-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.25); }
+  .fc-dash { flex: 1; height: 1px; background: rgba(255,255,255,.15); }
+
+  .fc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .fc-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px; padding: 3px 8px;
+    border-radius: 3px; letter-spacing: .05em;
+  }
+  .chip-conf { background: rgba(139,168,136,.25); color: #A8C8A4; }
+  .chip-code { background: rgba(255,255,255,.07); color: rgba(255,255,255,.4); }
+  .chip-warn { background: rgba(201,169,122,.2); color: #D4A96A; }
+
+  /* ── 選項卡 ── */
+  .opt-card {
+    background: var(--cream);
+    border: 1px solid var(--border-m);
+    border-radius: 10px; overflow: hidden;
+    margin-bottom: 14px;
+    scroll-margin-top: 76px;
+  }
+  @keyframes flashPulse {
+    0%   { outline-color: rgba(201,169,122,0); }
+    18%  { outline-color: rgba(201,169,122,.95); }
+    100% { outline-color: rgba(201,169,122,0); }
+  }
+  .opt-card.flash {
+    outline: 2px solid rgba(201,169,122,0);
+    outline-offset: 2px;
+    animation: flashPulse 1.25s ease-out;
+  }
+
+  .opt-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--cream); background: var(--ink);
+    padding: 3px 9px; border-radius: 3px; margin-bottom: 8px;
+  }
+
+  .opt-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .oh-left {}
+  .oh-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 5px;
+  }
+  .oh-name {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14.5px; font-weight: 400; color: var(--ink);
+    letter-spacing: .04em;
+  }
+  .oh-right { text-align: right; }
+  .oh-price {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px; font-weight: 300; color: var(--ink);
+    line-height: 1;
+  }
+  .oh-unit { font-size: 10px; color: var(--ink-soft); font-weight: 300; margin-top: 2px; }
+
+  .rec-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 2px; margin-top: 5px;
+    background: var(--sage-bg); color: var(--sage);
+    border: 1px solid rgba(139,168,136,.3);
+  }
+
+  .price-sub {
+    font-size: 9.5px; color: var(--ink-soft); margin-top: 2px;
+  }
+  .price-warn {
+    font-size: 9.5px; color: var(--blush); margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* ── 怎麼選（條列・可點跳轉） ── */
+  .pick-box {
+    background: var(--cream);
+    border: 1px solid var(--border-m);
+    border-radius: 10px;
+    padding: 9px 13px; margin-bottom: 16px;
+  }
+  .pick-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ash); margin-bottom: 7px;
+  }
+  .pick-row {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 6px 0; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--ink-mid); line-height: 1.45;
+    cursor: pointer; transition: background .15s;
+  }
+  .pick-row:first-of-type { border-top: none; }
+  .pick-row:hover { background: var(--linen); }
+  .pick-tag {
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .03em; font-weight: 500;
+    padding: 3px 8px; border-radius: 3px; white-space: nowrap; margin-top: 1px;
+  }
+  .pick-row b { color: var(--ink); font-weight: 600; }
+  .tag-save { background: var(--sage-bg);  color: var(--sage); }
+  .tag-fast { background: var(--sky-bg);   color: var(--sky); }
+  .tag-easy { background: var(--dust-bg);  color: var(--dust); }
+  .tag-skip { background: var(--blush-bg); color: var(--blush); }
+
+  .opt-body { padding: 14px 16px; }
+
+  /* ── 時間軸 ── */
+  .tl-row {
+    display: grid;
+    grid-template-columns: 46px 12px 1fr;
+    gap: 0 10px; align-items: stretch;
+  }
+  .tc { padding-top: 7px; text-align: right; }
+  .tc-t {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 400; color: var(--ink); line-height: 1;
+  }
+  .tc-n { font-size: 9px; color: var(--ash); margin-top: 2px; line-height: 1.3; }
+
+  .lc { display: flex; flex-direction: column; align-items: center; padding-top: 7px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .d-sage  { background: var(--sage); }
+  .d-dust  { background: var(--dust); }
+  .d-blush { background: var(--blush); }
+  .d-sky   { background: var(--sky); }
+  .d-ash   { background: var(--ash); }
+  .d-ink   { background: var(--ink); }
+
+  .ln { flex: 1; width: 1px; background: var(--border-m); margin-top: 4px; min-height: 8px; }
+  .ln-sage  { background: repeating-linear-gradient(to bottom, var(--sage) 0, var(--sage) 3px, transparent 3px, transparent 7px); }
+  .ln-dust  { background: repeating-linear-gradient(to bottom, var(--dust) 0, var(--dust) 3px, transparent 3px, transparent 7px); }
+  .ln-dash  { background: repeating-linear-gradient(to bottom, var(--border-m) 0, var(--border-m) 3px, transparent 3px, transparent 7px); }
+
+  .cc { padding: 5px 0 12px; }
+  .ev {
+    background: var(--linen);
+    border-radius: 6px; padding: 8px 11px;
+    border: 1px solid var(--border);
+  }
+  .ev.sage  { background: var(--sage-bg);  border-color: rgba(139,168,136,.3); }
+  .ev.dust  { background: var(--dust-bg);  border-color: rgba(201,169,122,.3); }
+  .ev.blush { background: var(--blush-bg); border-color: rgba(196,137,122,.3); }
+  .ev.sky   { background: var(--sky-bg);   border-color: rgba(122,155,180,.3); }
+
+  .ev-title {
+    font-size: 12px; font-weight: 500; color: var(--ink);
+    line-height: 1.35; margin-bottom: 2px; letter-spacing: .02em;
+  }
+  .ev.sage  .ev-title { color: #4A7048; }
+  .ev.dust  .ev-title { color: #7A5A28; }
+  .ev.blush .ev-title { color: #7A3E30; }
+  .ev-desc {
+    font-size: 11px; color: var(--ink-soft); line-height: 1.65;
+  }
+  .ev-desc b { color: var(--ink); font-weight: 500; }
+
+  /* ── 行李說明框 ── */
+  .luggage-box {
+    background: rgba(201,169,122,.08);
+    border: 1px solid rgba(201,169,122,.3);
+    border-radius: 6px; padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 11px; color: var(--ink-soft); line-height: 1.7;
+  }
+  .luggage-box .lb-title {
+    font-size: 10px; font-weight: 500; color: var(--dust);
+    letter-spacing: .06em; margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+  }
+  .luggage-box b { color: var(--ink); font-weight: 500; }
+
+  /* ── 轉機等待 ── */
+  .transit-row {
+    display: flex; align-items: center;
+    gap: 10px; padding: 0 0 10px 68px;
+  }
+  .tr-line { flex: 1; height: 1px; background: var(--border-m); }
+  .tr-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--ash); letter-spacing: .08em; white-space: nowrap;
+  }
+
+  /* ── CTA ── */
+  .cta-btn {
+    display: block; width: 100%; text-align: center;
+    padding: 12px 16px; margin-top: 12px;
+    border: 1px solid var(--ink);
+    border-radius: 6px; cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px; font-weight: 500; letter-spacing: .06em;
+    color: var(--ink); background: transparent;
+    text-decoration: none;
+    transition: all .18s;
+  }
+  .cta-btn:hover { background: var(--ink); color: var(--cream); }
+
+  /* ── 提示橫幅 ── */
+  .notice {
+    background: var(--dust-bg);
+    border-left: 2px solid var(--dust);
+    padding: 11px 14px; margin-top: 14px;
+    font-size: 11px; color: var(--ink-soft); line-height: 1.75;
+    border-radius: 0 6px 6px 0;
+  }
+  .notice b { color: var(--ink); font-weight: 500; }
+  .notice.sage-notice {
+    background: var(--sage-bg);
+    border-left-color: var(--sage);
+  }
+
+  /* ── 飯店卡 ── */
+  .hotel-cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .h-card {
+    background: var(--cream);
+    border: 1px solid var(--border-m);
+    border-radius: 10px; overflow: hidden;
+  }
+  .h-hd {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .h-name {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 14px; font-weight: 400; letter-spacing: .04em;
+    color: var(--ink); margin-bottom: 3px;
+  }
+  .h-meta { font-size: 10px; color: var(--ash); }
+  .h-dist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--ink-soft);
+    border: 1px solid var(--border-m);
+    padding: 3px 8px; border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+    background: var(--linen);
+  }
+
+  .h-prices {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .h-price {
+    padding: 10px 16px;
+    border-right: 1px solid var(--border);
+  }
+  .h-price:last-child { border-right: none; }
+  .hp-label { font-size: 9.5px; color: var(--ash); margin-bottom: 3px; letter-spacing: .02em; }
+  .hp-val {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px; font-weight: 300; color: var(--ink);
+  }
+  .hp-unit { font-size: 9px; color: var(--ink-soft); font-weight: 300; }
+
+  .h-foot { padding: 10px 14px; background: var(--paper); }
+
+  /* 分隔線 */
+  .hr { height: 1px; background: var(--border); margin: 4px 0 4px 58px; }
+
+  /* 回程確認帶 */
+  .conf-strip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px;
+    background: var(--sage-bg); border: 1px solid rgba(139,168,136,.3);
+    border-radius: 6px; margin-bottom: 14px;
+    font-size: 11px; color: #4A7048;
+  }
+  .cs-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 頁首 -->
+  <div class="pg-hd">
+    <div class="pg-eyebrow">旅行規劃 · 2026.09</div>
+    <h1 class="pg-title">台北 — Łódź — 台北</h1>
+    <div class="pg-sub">9 / 10 — 9 / 15 &nbsp;·&nbsp; 波蘭羅茲</div>
+  </div>
+
+  <!-- Tab -->
+  <div class="tabs-bar">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('out', this)">去程</button>
+      <button class="tab-btn" onclick="switchTab('ret', this)">回程</button>
+      <button class="tab-btn" onclick="switchTab('hotel', this)">住宿</button>
+      <button class="tab-btn" onclick="switchTab('expo', this)">布展資訊</button>
+      <button class="tab-btn" onclick="switchTab('booth', this)">攤位登記</button>
+    </div>
+  </div>
+
+  <!-- ════ 去程 ════ -->
+  <div class="panel active" id="panel-out">
+
+    <!-- 怎麼選 -->
+    <div class="pick-box">
+      <div class="pick-title">怎麼選 · 布拉格 → Łódź　（點一行跳到該方案）</div>
+      <div class="pick-row" onclick="jumpToOpt('out',1)">
+        <span class="pick-tag tag-save">最省錢</span>
+        <span><b>方案 2</b> FlixBus 直達 · €31/人 · 9h · 21:25 到</span>
+      </div>
+      <div class="pick-row" onclick="jumpToOpt('out',2)">
+        <span class="pick-tag tag-fast">最快到</span>
+        <span><b>方案 3</b> 轉華沙（LO528＋火車）· 約 16:30 到 · NT$10,000＋/人</span>
+      </div>
+      <div class="pick-row" onclick="jumpToOpt('out',3)">
+        <span class="pick-tag tag-easy">最省事</span>
+        <span><b>方案 4</b> 包車兩台八人座 · 門到門全程同行 · 7h · NT$10,848/人</span>
+      </div>
+      <div class="pick-row" onclick="jumpToOpt('out',0)">
+        <span class="pick-tag tag-skip">不建議</span>
+        <span><b>方案 1</b> 飛機繞道都柏林 · 最久最貴</span>
+      </div>
+    </div>
+
+    <!-- 班機 -->
+    <div class="flight-card">
+      <div class="fc-label">去程班機</div>
+      <div class="fc-route">
+        <div class="fc-city">
+          <div class="fc-time">00:10</div>
+          <div class="fc-loc">台北 TPE</div>
+          <div class="fc-date">9/10（四）</div>
+        </div>
+        <div class="fc-mid">
+          <div class="fc-dur">7h 40m</div>
+          <div class="fc-line">
+            <div class="fc-dot"></div>
+            <div class="fc-dash"></div>
+            <div class="fc-dot"></div>
+          </div>
+        </div>
+        <div class="fc-city r">
+          <div class="fc-time">07:50</div>
+          <div class="fc-loc">布拉格 PRG</div>
+          <div class="fc-date">9/10（四）</div>
+        </div>
+      </div>
+      <div class="fc-chips">
+        <span class="fc-chip chip-conf">已確認</span>
+        <span class="fc-chip chip-code">JX101</span>
+      </div>
+    </div>
+
+    <!-- 選項一 -->
+    <div class="sec-title">布拉格 — Łódź 交通</div>
+
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 1</div>
+          <div class="oh-type">飛機轉機 · Ryanair</div>
+          <div class="oh-name">中停都柏林</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">NT$4,497</div>
+          <div class="oh-unit">/ 人 · 機票含稅</div>
+          <div class="price-warn">行李需另購</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:50</div><div class="tc-n">落地</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">入境布拉格</div>
+              <div class="ev-desc">提行李、入境手續，約需 2–3 小時</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">13:55</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">PRG → 都柏林</div>
+              <div class="ev-desc">Ryanair，飛行約 2 小時</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">15:25</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">都柏林轉機等待</div>
+              <div class="ev-desc">等待 3 小時 10 分</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">18:35</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">都柏林 → Łódź</div>
+              <div class="ev-desc">Ryanair，飛行約 2 小時</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">22:20</div><div class="tc-n">抵達</div></div>
+          <div class="lc"><div class="dot d-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">抵達 Łódź 機場（LCJ）</div>
+              <div class="ev-desc">計程車至飯店約 20 分鐘</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="luggage-box">
+          <div class="lb-title">Ryanair 行李 · 廉航須另購</div>
+          10 kg — 約 NT$1,660　/　20 kg — 約 NT$2,904　/　23 kg — 約 NT$3,913
+        </div>
+      </div>
+    </div>
+
+    <!-- 選項二 -->
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 2</div>
+          <div class="oh-type">FlixBus · 直達</div>
+          <div class="oh-name">布拉格機場站上車</div>
+          <div class="rec-tag">建議選擇</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">NT$1,118</div>
+          <div class="oh-unit">/ 人 · 含行李 2 件</div>
+          <div class="price-sub">省約 NT$3,379 / 人</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:50</div><div class="tc-n">落地</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">入境布拉格</div>
+              <div class="ev-desc">提行李完成約 09:15，機場休息補眠</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">12:15</div></div>
+          <div class="lc"><div class="dot d-ink"></div><div class="ln ln-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">FlixBus 出發</div>
+              <div class="ev-desc">PRG Terminal 1 前方 80 公尺上車<br>直達，9 小時 10 分，<b>€31 / 人（約 NT$1,118）</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">21:25</div><div class="tc-n">抵達</div></div>
+          <div class="lc"><div class="dot d-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">抵達 Łódź 巴士站</div>
+              <div class="ev-desc">計程車 5 分至 Manufaktura / 飯店</div>
+            </div>
+          </div>
+        </div>
+
+        <a class="cta-btn" href="https://shop.global.flixbus.com/search?departureCity=Prague+Airport&arrivalCity=Lodz&rideDate=09/10/2026&adult=2" target="_blank">
+          訂 FlixBus 去程票（9/10）
+        </a>
+      </div>
+    </div>
+
+    <!-- 選項三 -->
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 3</div>
+          <div class="oh-type">飛機轉機 · LOT + 火車</div>
+          <div class="oh-name">經華沙 WAW</div>
+          <div class="rec-tag" style="background:var(--dust-bg);color:var(--dust);border-color:rgba(201,169,122,.4);">最快抵達 · 約 16:30 到</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">約 NT$10,000＋</div>
+          <div class="oh-unit">/ 人 · 機票+火車</div>
+          <div class="price-warn">比巴士貴約 NT$9,000＋ / 人</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:50</div><div class="tc-n">落地</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">入境布拉格 · 轉 LOT 櫃台</div>
+              <div class="ev-desc">不同張票需<b>自理轉機</b>：提行李、重新托運、過安檢</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">12:45</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">LOT Polish Airlines LO528</div>
+              <div class="ev-desc">布拉格 12:45 → 華沙 14:00（飛行 1h15）<br>含手提 8kg、托運 23kg．機票約 NT$10,000＋ / 人</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">14:00</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">抵華沙 Chopin 機場</div>
+              <div class="ev-desc">提行李後，機場地下月台搭 S2 城市快鐵</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">14:40</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">S2：機場 → Warszawa Zachodnia</div>
+              <div class="ev-desc">城市快鐵，約 15 分．每 15–30 分一班</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">15:25</div></div>
+          <div class="lc"><div class="dot d-ink"></div><div class="ln ln-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">PKP Intercity → Łódź Fabryczna</div>
+              <div class="ev-desc">Zachodnia 轉乘，<b>每小時一班</b><br>車程 1h14，€10–15 / 人（約 NT$360–540）</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">16:35</div><div class="tc-n">抵達</div></div>
+          <div class="lc"><div class="dot d-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">抵達 Łódź Fabryczna（市中心）</div>
+              <div class="ev-desc">比直達巴士早約 5 小時．步行/計程車至 Manufaktura / 飯店</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="luggage-box">
+          <div class="lb-title">最後一段 · 火車 vs 巴士</div>
+          <b>建議搭火車</b>（每小時一班，14:00 落地可順接）：機場 S2 → Warszawa Zachodnia → PKP IC → Łódź Fabryczna。<br>
+          FlixBus 機場直達也有（1h30、€8–13），但<b>白天 10:10 後要等到 18:00</b>，對 14:00 抵達不利，此時段不建議。
+        </div>
+
+        <a class="cta-btn" href="https://www.lot.com/" target="_blank">
+          查 LOT 機票（PRG → WAW · 9/10）
+        </a>
+        <a class="cta-btn" href="https://koleo.pl/en" target="_blank">
+          查火車票（Warszawa → Łódź）
+        </a>
+      </div>
+    </div>
+
+    <!-- 選項四：包車 -->
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 4</div>
+          <div class="oh-type">包車 · 兩台八人座</div>
+          <div class="oh-name">布拉格 → Łódź 直達</div>
+          <div class="rec-tag" style="background:var(--sky-bg);color:var(--sky);border-color:rgba(122,155,180,.4);">門到門 · 全程同行</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">NT$10,848</div>
+          <div class="oh-unit">/ 人 · 12 人均分</div>
+          <div class="price-sub">共 €3,600（約 NT$130,168）</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:50</div><div class="tc-n">落地</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">入境布拉格 · 司機接機</div>
+              <div class="ev-desc">提行李、入境後，航廈外上車</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">09:30</div><div class="tc-n">出發</div></div>
+          <div class="lc"><div class="dot d-ink"></div><div class="ln ln-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">兩台八人座出發</div>
+              <div class="ev-desc">布拉格機場直達 Łódź，車程約 <b>7 小時</b><br>共 €3,600（兩台）</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">途中</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">中途休息站</div>
+              <div class="ev-desc">可下車上廁所、伸展休息</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">約16:30</div><div class="tc-n">抵達</div></div>
+          <div class="lc"><div class="dot d-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">直達 Łódź 飯店門口</div>
+              <div class="ev-desc">門到門、全程同行，行李免轉運搬運</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════ 回程 ════ -->
+  <div class="panel" id="panel-ret">
+
+    <!-- 怎麼選 -->
+    <div class="pick-box">
+      <div class="pick-title">怎麼選 · Łódź → 布拉格機場　（點一行跳到該方案）</div>
+      <div class="pick-row" onclick="jumpToOpt('ret',0)">
+        <span class="pick-tag tag-save">最省錢</span>
+        <span><b>方案 1</b> FlixBus 直達 · €30.98/人 · 車上過夜 · 抵達後僅 2h35 緩衝</span>
+      </div>
+      <div class="pick-row" onclick="jumpToOpt('ret',1)">
+        <span class="pick-tag tag-fast">提前到</span>
+        <span><b>方案 2</b> 火車＋飛機 · 前一晚到布拉格 · 機場過夜 · NT$7,060＋/人</span>
+      </div>
+    </div>
+
+    <!-- 已確認帶 -->
+    <div class="conf-strip">
+      <div class="cs-dot"></div>
+      <span>班次已確認 · FlixBus 官網截圖核實</span>
+    </div>
+
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 1</div>
+          <div class="oh-type">FlixBus · 直達機場</div>
+          <div class="oh-name">Łódź → Prague Airport</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">€30.98</div>
+          <div class="oh-unit">/ 人 · 約 NT$1,118</div>
+        </div>
+      </div>
+      <div class="opt-body">
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">20:30</div><div class="tc-n">建議</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">取行李 — 計程車至巴士站</div>
+              <div class="ev-desc">Manufaktura 至 Łódź Bus Station 約 <b>5 分鐘</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">23:05</div><div class="tc-n">9/14（一）</div></div>
+          <div class="lc"><div class="dot d-ink"></div><div class="ln ln-sage"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">FlixBus 出發 · 直達 PRG</div>
+              <div class="ev-desc">Wi-Fi · 充電座 · 廁所 · 8h 40m<br>最快班次</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:45</div><div class="tc-n">9/15（二）</div></div>
+          <div class="lc"><div class="dot d-sage"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev sage">
+              <div class="ev-title">抵達 Prague Airport Terminal 1</div>
+              <div class="ev-desc">下車即在 Terminal 1 前方 80 公尺<br>距起飛 <b>2 小時 35 分緩衝</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">07:45</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">Check-in · 安檢（Terminal 1）</div>
+              <div class="ev-desc">非申根航班，請預留 60–90 分鐘<br>建議 09:20 前完成</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">10:20</div></div>
+          <div class="lc"><div class="dot d-blush"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">JX102 PRG — TPE 起飛</div>
+              <div class="ev-desc">抵台北：9/16（三）05:10</div>
+            </div>
+          </div>
+        </div>
+
+        <a class="cta-btn" href="https://shop.global.flixbus.com/search?departureCity=Lodz&arrivalCity=Prague+Airport&rideDate=09/14/2026&adult=2" target="_blank">
+          訂 FlixBus 回程票（9/14 23:05）
+        </a>
+      </div>
+    </div>
+
+    <!-- 方案二：火車 + 飛機 -->
+    <div class="opt-card">
+      <div class="opt-head">
+        <div class="oh-left">
+          <div class="opt-tag">方案 2</div>
+          <div class="oh-type">飛機回程 · LOT + 火車</div>
+          <div class="oh-name">經華沙 · 機場過夜</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price">NT$7,060</div>
+          <div class="oh-unit">/ 人 · 機票（隨身8kg）</div>
+          <div class="price-warn">+23kg 托運 +NT$1,800</div>
+        </div>
+      </div>
+      <div class="opt-body">
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">12:00</div><div class="tc-n">9/14（一）</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">飯店退房 · 行李寄放</div>
+              <div class="ev-desc">中午 12:00 退房，行李寄前台</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">16:30</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">取行李 → Łódź Fabryczna 車站</div>
+              <div class="ev-desc">計程車約 5 分至火車站</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">17:00</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">火車 Łódź → 華沙機場</div>
+              <div class="ev-desc">PKP IC（1h14，每小時一班）+ S2 接駁，約 2h<br>火車合計 €10–15 / 人（約 NT$360–540）</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">18:40</div></div>
+          <div class="lc"><div class="dot d-dust"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev dust">
+              <div class="ev-title">抵華沙機場 · check-in</div>
+              <div class="ev-desc">托運、安檢，建議 18:45 前完成</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">20:25</div></div>
+          <div class="lc"><div class="dot d-sky"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev sky">
+              <div class="ev-title">LOT 華沙 WAW → 布拉格 PRG</div>
+              <div class="ev-desc">LOT Polish Airlines，飛行 1h15</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">21:40</div><div class="tc-n">9/14 夜</div></div>
+          <div class="lc"><div class="dot d-ash"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev">
+              <div class="ev-title">抵布拉格 Terminal 1 · 機場過夜</div>
+              <div class="ev-desc">當晚在機場候機過夜，等隔日班機</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">10:20</div><div class="tc-n">9/15（二）</div></div>
+          <div class="lc"><div class="dot d-blush"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">JX102 PRG → TPE 起飛</div>
+              <div class="ev-desc">抵台北：9/16（三）05:10</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="luggage-box">
+          <div class="lb-title">機場過夜 · 提醒</div>
+          華沙→布拉格為<b>申根航班（T2 入境）</b>，JX102 在 <b>T1（非申根）</b>；夜間部分航廈區域會關閉，建議確認候機區開放時段，或訂機場旁旅館休息。
+        </div>
+
+        <a class="cta-btn" href="https://www.lot.com/" target="_blank">
+          查 LOT 機票（WAW → PRG · 9/14 20:25）
+        </a>
+        <a class="cta-btn" href="https://koleo.pl/en" target="_blank">
+          查火車票（Łódź → 華沙）
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════ 住宿 ════ -->
+  <div class="panel" id="panel-hotel">
+
+    <div class="sec-title">5 晚住宿 · 9/10–9/15</div>
+
+    <div class="hotel-cards">
+
+      <div class="h-card">
+        <div class="h-hd">
+          <div>
+            <div class="h-name">Vienna House by Wyndham Andel's</div>
+            <div class="h-meta">27 m²</div>
+          </div>
+          <div class="h-dist">最近</div>
+        </div>
+        <div class="h-prices">
+          <div class="h-price">
+            <div class="hp-label">無早餐</div>
+            <div class="hp-val">20,351<span class="hp-unit"> 元</span></div>
+          </div>
+          <div class="h-price">
+            <div class="hp-label">附早餐</div>
+            <div class="hp-val">27,836<span class="hp-unit"> 元</span></div>
+          </div>
+        </div>
+        <div class="h-foot">
+          <a class="cta-btn" href="https://www.booking.com/hotel/pl/hotelandelslodz.zh-tw.html" target="_blank">
+            查看 Booking.com
+          </a>
+        </div>
+      </div>
+
+      <div class="h-card">
+        <div class="h-hd">
+          <div>
+            <div class="h-name">Hotel The Loom</div>
+            <div class="h-meta">20 m²</div>
+          </div>
+          <div class="h-dist">最近</div>
+        </div>
+        <div class="h-prices">
+          <div class="h-price">
+            <div class="hp-label">無早餐</div>
+            <div class="hp-val">16,688<span class="hp-unit"> 元</span></div>
+          </div>
+          <div class="h-price">
+            <div class="hp-label">附早餐</div>
+            <div class="hp-val">24,173<span class="hp-unit"> 元</span></div>
+          </div>
+        </div>
+        <div class="h-foot">
+          <a class="cta-btn" href="https://www.booking.com/hotel/pl/the-loom.zh-tw.html" target="_blank">
+            查看 Booking.com
+          </a>
+        </div>
+      </div>
+
+      <div class="h-card">
+        <div class="h-hd">
+          <div>
+            <div class="h-name">PURO Łódź Centrum</div>
+            <div class="h-meta">19 m²</div>
+          </div>
+          <div class="h-dist">最近</div>
+        </div>
+        <div class="h-prices">
+          <div class="h-price">
+            <div class="hp-label">無早餐</div>
+            <div class="hp-val">25,030<span class="hp-unit"> 元</span></div>
+          </div>
+          <div class="h-price">
+            <div class="hp-label">附早餐</div>
+            <div class="hp-val">30,015<span class="hp-unit"> 元</span></div>
+          </div>
+        </div>
+        <div class="h-foot">
+          <a class="cta-btn" href="https://www.booking.com/hotel/pl/puro-lodz-centrum-lodz.zh-tw.html" target="_blank">
+            查看 Booking.com
+          </a>
+        </div>
+      </div>
+
+      <div class="h-card">
+        <div class="h-hd">
+          <div>
+            <div class="h-name">Krzywa Kamienica</div>
+            <div class="h-meta">16–24 m²</div>
+          </div>
+          <div class="h-dist">步行 17 分</div>
+        </div>
+        <div class="h-prices">
+          <div class="h-price">
+            <div class="hp-label">無早餐</div>
+            <div class="hp-val">16,078<span class="hp-unit"> 元</span></div>
+          </div>
+          <div class="h-price">
+            <div class="hp-label">附早餐</div>
+            <div class="hp-val">17,845<span class="hp-unit"> 元</span></div>
+          </div>
+        </div>
+        <div class="h-foot">
+          <a class="cta-btn" href="https://www.booking.com/hotel/pl/krzywa-kamienica.zh-tw.html" target="_blank">
+            查看 Booking.com
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="notice sage-notice" style="margin-top:16px;">
+      <b>提醒：</b>所有住宿皆可退訂。9/14 中午 12:00 前退房，行李可寄放前台，20:30 取回出發。
+    </div>
+
+  </div>
+
+  <!-- ════ 布展資訊 ════ -->
+  <div class="panel" id="panel-expo">
+
+    <div class="sec-title">市集布展 · 9/11（五）· Łódź</div>
+
+    <div class="opt-card" style="border-color:rgba(196,137,122,.4);">
+      <div class="opt-head" style="background:var(--blush-bg);border-bottom-color:rgba(196,137,122,.3);">
+        <div class="oh-left">
+          <div class="opt-tag" style="background:var(--blush);color:var(--cream);">市集當天</div>
+          <div class="oh-type" style="color:#7A3E30;">9/11（五）</div>
+          <div class="oh-name">市集活動 12:00 – 20:00</div>
+        </div>
+        <div class="oh-right">
+          <div class="oh-price" style="color:#7A3E30;">8h</div>
+          <div class="oh-unit">營業時段</div>
+        </div>
+      </div>
+      <div class="opt-body">
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">10:00</div><div class="tc-n">進場</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln ln-dash"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">品牌進場佈置</div>
+              <div class="ev-desc">10:00–11:30 進場、佈置攤位</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">11:40</div><div class="tc-n">就位</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">完成佈置就位</div>
+              <div class="ev-desc"><b>11:40 前</b>須全部佈置完成、準備營業</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">12:00</div><div class="tc-n">開始</div></div>
+          <div class="lc"><div class="dot d-blush"></div><div class="ln"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">市集活動開始</div>
+              <div class="ev-desc">12:00–20:00 對外營業，共 8 小時</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tc"><div class="tc-t">20:00</div><div class="tc-n">撤場</div></div>
+          <div class="lc"><div class="dot d-blush"></div></div>
+          <div class="cc">
+            <div class="ev blush">
+              <div class="ev-title">撤場</div>
+              <div class="ev-desc">20:00–22:00 收攤、撤場完成</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice" style="background:var(--blush-bg);border-left-color:var(--blush);">
+      <b>時程重點：</b>10:00 進場 → <b>11:40 前就位</b> → 12:00–20:00 營業 → 20:00–22:00 撤場。
+    </div>
+
+  </div>
+
+  <!-- ════ 攤位登記 ════ -->
+  <div class="panel" id="panel-booth">
+    <div class="sec-title">攤位資料登記</div>
+    <div class="opt-card" style="padding:24px 18px;text-align:center;">
+      <div style="font-family:'Noto Serif TC',serif;font-size:17px;color:var(--ink);letter-spacing:.04em;margin-bottom:7px;">填寫 / 修改攤位資料</div>
+      <div style="font-size:12px;color:var(--ink-soft);line-height:1.75;margin-bottom:18px;">
+        商品照片、介紹、用水／用電需求<br>全程在表單頁完成，送出後可隨時登入修改
+      </div>
+      <a class="cta-btn" href="https://script.google.com/macros/s/AKfycbziOqqM--NLy0CHlzf5cNL9h0Jj9IcnaF8gyqvK5b2abfHNbmsPIwecWwlYlXMhG7tGlA/exec" target="_blank" style="background:var(--ink);color:var(--cream);margin:0;">前往攤位登記頁 ↗</a>
+    </div>
+
+    <div class="notice" style="background:var(--sage-bg);border-left:3px solid var(--sage);color:#4A7048;">
+      <b>怎麼用：</b>首次用<b>活動密碼</b>註冊（向主辦索取）→ 設定自己的 Email 與密碼 → 填資料、上傳照片。日後用 Email＋密碼登入即可修改。
+    </div>
+    <div class="notice" style="background:var(--dust-bg);border-left:3px solid var(--dust);color:#7A5A28;">
+      商品照片與介紹可改到活動前；<b>用水／用電需求於截止日後鎖定</b>不可改（主辦統計用）。
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+function jumpToOpt(panel, idx) {
+  var cards = document.getElementById('panel-' + panel).querySelectorAll('.opt-card');
+  var el = cards[idx];
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+</script>
+</body>
+</html>
