@@ -27,6 +27,11 @@
   .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
   a{color:var(--sage);}
   .dl{font-size:11px;margin-top:3px;text-align:center;}
+  .thumb{cursor:zoom-in;}
+  #lb{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out;}
+  #lb.on{display:flex;}
+  #lb img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+  #lb .lbx{position:fixed;top:14px;right:18px;color:rgba(255,255,255,.85);font-size:13px;}
 </style>
 </head>
 <body>
@@ -129,11 +134,14 @@ function showPhotos(i){
   rpc('booth_admin_photos',{admin_password:PW,p_email:ROWS[i].email}).then(function(r){
     if(!r||!r.ok){a.textContent='載入失敗';return;}
     var photos=r.photos||[]; var brand=(r.brand||'品牌');
-    var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="'+p+'" target="_blank"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
+    var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="#" onclick="return openLb(this)"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
     $('ph-'+i).innerHTML=h; a.style.display='none';
   }).catch(function(){a.textContent='載入失敗';});
   return false;
 }
+function openLb(a){var img=a.querySelector('img');if(!img)return false;$('lb-img').src=img.src;$('lb').classList.add('on');return false;}
+function closeLb(){$('lb').classList.remove('on');$('lb-img').src='';}
 </script>
+<div id="lb" onclick="closeLb()"><span class="lbx">✕ 點任意處關閉</span><img id="lb-img" alt=""></div>
 </body>
 </html>
