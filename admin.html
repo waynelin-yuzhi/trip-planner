@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>攤位登記 · 管理檢視</title>
+<title>品牌登記 · 管理檢視</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
   :root{--paper:#F5F0E8;--cream:#FEFCF7;--linen:#EDE8DE;--ash:#B8B2A6;--ink:#2A2520;--ink-mid:#5A534C;--ink-soft:#8C857C;--sage:#8BA888;--sage-bg:#EFF4EE;--dust:#C9A97A;--dust-bg:#FAF3E8;--blush:#C4897A;--blush-bg:#FAF0EE;--border:rgba(90,83,76,.14);--border-m:rgba(90,83,76,.24);}
@@ -31,7 +31,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>攤位登記 · 管理檢視</h1>
+  <h1>品牌登記 · 管理檢視</h1>
   <div class="card" id="login">
     <label>管理者密碼</label>
     <input type="password" id="apw" onkeydown="if(event.key==='Enter')go()">
@@ -70,7 +70,8 @@ function render(res){
       (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
       (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
       '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開／下載</a>':'')+'</div>'+
-      '<div class="thumbs" id="ph-'+i+'"></div></div>';
+      '<div class="thumbs" id="ph-'+i+'"></div>'+
+      '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';
   });
   $('panel').innerHTML=h;
   loadEvents();
@@ -113,11 +114,21 @@ function delEvent(code){
   });
   return false;
 }
+function delBrand(i){
+  var r=ROWS[i]; if(!r)return false;
+  var pw=prompt('刪除品牌「'+r.brand+'」？此動作無法復原。\n請再次輸入管理密碼確認：');
+  if(!pw)return false;
+  rpc('booth_admin_delete_brand',{admin_password:pw,p_email:r.email}).then(function(res){
+    if(!res||!res.ok){alert((res&&res.error)||'刪除失敗');return;}
+    rpc('booth_admin_list',{admin_password:PW}).then(function(rr){if(rr&&rr.ok)render(rr);});
+  });
+  return false;
+}
 function showPhotos(i){
   var a=$('pl-'+i); a.textContent='載入中…';
   rpc('booth_admin_photos',{admin_password:PW,p_email:ROWS[i].email}).then(function(r){
     if(!r||!r.ok){a.textContent='載入失敗';return;}
-    var photos=r.photos||[]; var brand=(r.brand||'攤位');
+    var photos=r.photos||[]; var brand=(r.brand||'品牌');
     var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="'+p+'" target="_blank"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
     $('ph-'+i).innerHTML=h; a.style.display='none';
   }).catch(function(){a.textContent='載入失敗';});

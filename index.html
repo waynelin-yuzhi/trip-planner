@@ -82,16 +82,15 @@
   .booth-cta {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     width: 100%; margin-bottom: 16px; padding: 13px 16px;
-    border: none; border-radius: 8px; text-align: left;
-    background: var(--ink); color: var(--cream);
+    border: 1px solid var(--sage); border-radius: 8px; text-align: left;
+    background: var(--sage-bg); color: var(--ink);
     font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: all .18s;
   }
-  .booth-cta .bc-main { display:block; font-size: 14px; font-weight: 500; letter-spacing: .05em; }
-  .booth-cta .bc-sub { display:block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.6); margin-top: 2px; }
-  .booth-cta .bc-arrow { font-size: 17px; color: rgba(255,255,255,.7); flex-shrink: 0; }
-  .booth-cta.on { background: var(--sage); }
-  .booth-cta.on .bc-sub { color: rgba(255,255,255,.85); }
-  .booth-cta.on .bc-arrow { color: rgba(255,255,255,.9); }
+  .booth-cta .bc-main { display:block; font-size: 14px; font-weight: 500; letter-spacing: .05em; color: #3F6B3D; }
+  .booth-cta .bc-sub { display:block; font-size: 11px; font-weight: 400; color: #5E7E5B; margin-top: 2px; }
+  .booth-cta .bc-arrow { font-size: 17px; color: var(--sage); flex-shrink: 0; }
+  .booth-cta.on { background: var(--sage); border-color: var(--sage); }
+  .booth-cta.on .bc-main, .booth-cta.on .bc-sub, .booth-cta.on .bc-arrow { color: var(--cream); }
   .tab-btn {
     padding: 10px 4px;
     background: var(--cream); border: none;
@@ -252,9 +251,9 @@
     cursor: pointer; transition: background .15s;
   }
   .pick-row:first-of-type { border-top: none; }
-  .pick-row:hover { background: var(--linen); }
+  @media (hover:hover) { .pick-row:hover { background: var(--linen); } }
   .pick-tag {
-    flex-shrink: 0;
+    flex-shrink: 0; min-width: 52px; text-align: center;
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px; letter-spacing: .03em; font-weight: 500;
     padding: 3px 8px; border-radius: 3px; white-space: nowrap; margin-top: 1px;
@@ -479,7 +478,7 @@
 
   <!-- Tab -->
   <button class="booth-cta" id="boothCta" onclick="showBooth()">
-    <span><span class="bc-main">攤位登記</span><span class="bc-sub">填寫 / 修改你的攤位資料</span></span>
+    <span><span class="bc-main">品牌登記</span><span class="bc-sub">填寫 / 修改你的品牌資料</span></span>
     <span class="bc-arrow">→</span>
   </button>
 
@@ -1171,7 +1170,7 @@
           <div class="cc">
             <div class="ev blush">
               <div class="ev-title">品牌進場佈置</div>
-              <div class="ev-desc">10:00–11:30 進場、佈置攤位</div>
+              <div class="ev-desc">10:00–11:30 進場、佈置</div>
             </div>
           </div>
         </div>
@@ -1214,9 +1213,9 @@
 
   </div>
 
-  <!-- ════ 攤位登記 ════ -->
+  <!-- ════ 品牌登記 ════ -->
   <div class="panel" id="panel-booth">
-    <div class="sec-title">攤位資料登記</div>
+    <div class="sec-title">品牌資料登記</div>
     <div class="bf-note info" style="margin-bottom:14px">
       首次請<b>註冊</b>（需主辦提供的<b>活動代碼</b>），之後用 Email＋密碼<b>登入</b>即可隨時修改。商品照片與介紹可改到活動前；用水／用電需求於截止日後鎖定。
     </div>
@@ -1224,7 +1223,7 @@
     <div id="bf-auth">
       <div class="bf-sw">
         <button id="bf-tLogin" class="on" onclick="bfTab('login')">登入</button>
-        <button id="bf-tReg" onclick="bfTab('reg')">註冊新攤位</button>
+        <button id="bf-tReg" onclick="bfTab('reg')">註冊新品牌</button>
       </div>
       <div class="bf-card" id="bf-loginCard">
         <label class="bf-req">Email</label>
@@ -1237,7 +1236,7 @@
       <div class="bf-card" id="bf-regCard" style="display:none">
         <label class="bf-req">活動代碼</label>
         <input type="text" id="bf-rReg" placeholder="主辦提供的活動代碼">
-        <label class="bf-req">品牌 / 攤位名稱</label>
+        <label class="bf-req">品牌名稱</label>
         <input type="text" id="bf-rBrand">
         <label class="bf-req">聯絡人</label>
         <input type="text" id="bf-rContact">
@@ -1258,7 +1257,7 @@
           <button class="bf-btn ghost" style="width:auto;margin:0;padding:6px 12px;font-size:12px" onclick="bfLogout()">登出</button></div>
       </div>
       <div class="bf-card">
-        <label class="bf-req">品牌 / 攤位名稱</label>
+        <label class="bf-req">品牌名稱</label>
         <input type="text" id="bf-brand">
         <label class="bf-req">聯絡人</label>
         <input type="text" id="bf-contact">
@@ -1346,15 +1345,15 @@ function jumpToOpt(panel, idx) {
   $('bf-loginBtn').onclick=function(){var e=$('bf-lEmail').value.trim(),p=$('bf-lPwd').value;if(!e||!p)return msg('bf-loginMsg','請輸入 Email 與密碼');this.disabled=true;this.textContent='登入中…';var b=this;rpc('booth_login',{p_email:e,p_password:p}).then(function(r){b.disabled=false;b.textContent='登入';if(!r||!r.ok)return msg('bf-loginMsg',(r&&r.error)||'登入失敗');SESS={email:e,password:p};enter(r);}).catch(function(){b.disabled=false;b.textContent='登入';msg('bf-loginMsg','連線失敗，請重試');});};
   $('bf-regBtn').onclick=function(){var d={reg_password:$('bf-rReg').value,p_brand:$('bf-rBrand').value.trim(),p_contact:$('bf-rContact').value.trim(),p_email:$('bf-rEmail').value.trim(),p_phone:$('bf-rPhone').value.trim(),p_password:$('bf-rPwd').value};if(!d.reg_password||!d.p_brand||!d.p_contact||!d.p_email||!d.p_password)return msg('bf-regMsg','請完整填寫必填欄位');this.disabled=true;this.textContent='註冊中…';var b=this;rpc('booth_register',d).then(function(r){b.disabled=false;b.textContent='註冊並開始填寫';if(!r||!r.ok)return msg('bf-regMsg',(r&&r.error)||'註冊失敗');SESS={email:d.p_email,password:d.p_password};enter(r);}).catch(function(){b.disabled=false;b.textContent='註冊並開始填寫';msg('bf-regMsg','連線失敗，請重試');});};
   function enter(r){CFG=r.config||{};$('bf-auth').style.display='none';$('bf-edit').style.display='block';$('bf-statsNote').textContent=CFG.deadlinePassed?'水源／用電需求已截止，無法修改（僅供檢視）。':'此區為主辦統計用，截止日後將鎖定不可改。';if(CFG.deadlinePassed)$('bf-statsCard').classList.add('bf-locked');fill(r.data);}
-  function fill(d){$('bf-who').textContent=d.brand||d.email;$('bf-brand').value=d.brand||'';$('bf-contact').value=d.contact||'';$('bf-phone').value=d.phone||'';$('bf-intro').value=d.intro||'';$('bf-ic').textContent=(d.intro||'').length;$('bf-note').value=d.note||'';$('bf-powerDetail').value=d.powerDetail||'';sr('bf-water',d.water);sr('bf-power',d.power);EX=(d.photos||[]).slice();NW=[];thumbs();setCta('Hi，'+(d.brand||d.email)+'！','點此查看／修改你的攤位資料');}
+  function fill(d){$('bf-who').textContent=d.brand||d.email;$('bf-brand').value=d.brand||'';$('bf-contact').value=d.contact||'';$('bf-phone').value=d.phone||'';$('bf-intro').value=d.intro||'';$('bf-ic').textContent=(d.intro||'').length;$('bf-note').value=d.note||'';$('bf-powerDetail').value=d.powerDetail||'';sr('bf-water',d.water);sr('bf-power',d.power);EX=(d.photos||[]).slice();NW=[];thumbs();setCta('Hi，'+(d.brand||d.email)+'！','點此查看／修改你的品牌資料');}
   $('bf-intro').addEventListener('input',function(){$('bf-ic').textContent=this.value.length;});
   $('bf-file').addEventListener('change',function(){var MAX=6,room=MAX-(EX.length+NW.length);if(room<=0){alert('每家最多 '+MAX+' 張照片');this.value='';return;}var files=Array.from(this.files||[]);files.slice(0,room).forEach(function(f){comp(f,function(u){NW.push(u);thumbs();});});if(files.length>room)alert('每家最多 '+MAX+' 張，僅加入前 '+room+' 張');this.value='';});
   function comp(file,cb){var img=new Image(),rd=new FileReader();rd.onload=function(){img.onload=function(){var mx=2000,w=img.width,h=img.height;if(w>mx||h>mx){if(w>h){h=Math.round(h*mx/w);w=mx;}else{w=Math.round(w*mx/h);h=mx;}}var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.85));};img.src=rd.result;};rd.readAsDataURL(file);}
   function thumbs(){var h='';EX.forEach(function(p,i){h+='<div class="bf-thumb"><img src="'+p+'"><div class="x" onclick="bfRmE('+i+')">×</div></div>';});NW.forEach(function(p,i){h+='<div class="bf-thumb"><img src="'+p+'"><div class="x" onclick="bfRmN('+i+')">×</div></div>';});$('bf-thumbs').innerHTML=h;}
   window.bfRmE=function(i){EX.splice(i,1);thumbs();};
   window.bfRmN=function(i){NW.splice(i,1);thumbs();};
-  $('bf-saveBtn').onclick=function(){if(!$('bf-brand').value.trim())return alert('請填品牌/攤位名稱');this.disabled=true;$('bf-status').textContent='儲存中…';var b=this;var args={p_email:SESS.email,p_password:SESS.password,p_brand:$('bf-brand').value.trim(),p_contact:$('bf-contact').value.trim(),p_phone:$('bf-phone').value.trim(),p_intro:$('bf-intro').value.trim(),p_note:$('bf-note').value.trim(),p_water:gr('bf-water'),p_power:gr('bf-power'),p_power_detail:$('bf-powerDetail').value.trim(),p_photos:EX.concat(NW)};rpc('booth_save',args).then(function(r){b.disabled=false;if(!r||!r.ok){$('bf-status').textContent='';return alert((r&&r.error)||'儲存失敗');}fill(r.data);$('bf-status').innerHTML='<div class="bf-note ok">已儲存！</div>';setTimeout(function(){$('bf-status').innerHTML='';},2500);}).catch(function(){b.disabled=false;$('bf-status').textContent='';alert('連線失敗，請重試');});};
-  window.bfLogout=function(){SESS=null;EX=[];NW=[];$('bf-edit').style.display='none';$('bf-auth').style.display='block';$('bf-lPwd').value='';window.bfTab('login');setCta('攤位登記','填寫 / 修改你的攤位資料');};
+  $('bf-saveBtn').onclick=function(){if(!$('bf-brand').value.trim())return alert('請填品牌名稱');this.disabled=true;$('bf-status').textContent='儲存中…';var b=this;var args={p_email:SESS.email,p_password:SESS.password,p_brand:$('bf-brand').value.trim(),p_contact:$('bf-contact').value.trim(),p_phone:$('bf-phone').value.trim(),p_intro:$('bf-intro').value.trim(),p_note:$('bf-note').value.trim(),p_water:gr('bf-water'),p_power:gr('bf-power'),p_power_detail:$('bf-powerDetail').value.trim(),p_photos:EX.concat(NW)};rpc('booth_save',args).then(function(r){b.disabled=false;if(!r||!r.ok){$('bf-status').textContent='';return alert((r&&r.error)||'儲存失敗');}fill(r.data);$('bf-status').innerHTML='<div class="bf-note ok">已儲存！</div>';setTimeout(function(){$('bf-status').innerHTML='';},2500);}).catch(function(){b.disabled=false;$('bf-status').textContent='';alert('連線失敗，請重試');});};
+  window.bfLogout=function(){SESS=null;EX=[];NW=[];$('bf-edit').style.display='none';$('bf-auth').style.display='block';$('bf-lPwd').value='';window.bfTab('login');setCta('品牌登記','填寫 / 修改你的品牌資料');};
 })();
 </script>
 
