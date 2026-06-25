@@ -13,7 +13,7 @@
   h1{font-size:18px;font-weight:500;margin-bottom:14px;}
   .card{background:var(--cream);border:1px solid var(--border-m);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
   label{display:block;font-size:12px;font-weight:500;color:var(--ink-mid);margin-bottom:5px;}
-  input[type=password]{width:100%;border:1px solid var(--border-m);border-radius:7px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  input{width:100%;border:1px solid var(--border-m);border-radius:7px;padding:9px 11px;font-size:14px;font-family:inherit;}
   .btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;background:var(--ink);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;}
   .msg{font-size:12px;color:var(--blush);margin-top:8px;}
   .sum{font-size:13px;}
@@ -54,11 +54,17 @@ function render(res){
   var power=ROWS.filter(function(r){return r.power;}).length;
   var dl=res.config&&res.config.deadline?new Date(res.config.deadline).toLocaleDateString('zh-TW'):'';
   var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a href="index.html" style="font-size:12px;color:var(--ink-mid);text-decoration:none">← 返回主頁</a><button onclick="logout()" style="font-size:12px;padding:6px 13px;border:1px solid var(--border-m);border-radius:6px;background:var(--cream);color:var(--ink-mid);cursor:pointer;font-family:inherit">登出</button></div>'
-    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b><div class="meta" style="margin-top:4px">統計截止：'+dl+(res.config&&res.config.deadlinePassed?'（已截止）':'')+'</div></div>';
+    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">活動管理</div><div id="ev-list" class="meta">載入中…</div>'
+    +'<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="ev-code" placeholder="活動代碼"><input id="ev-name" placeholder="活動名稱"></div>'
+    +'<label style="margin-top:8px">資料上傳期限</label><input id="ev-deadline" type="date">'
+    +'<button class="btn" onclick="saveEvent()">新增 / 更新活動</button><div class="msg" id="ev-msg"></div></div></div>'
+    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b></div>';
   if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
   ROWS.forEach(function(r,i){
     h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
       '<div class="meta">'+esc(r.contact)+' · '+esc(r.email)+(r.phone?' · '+esc(r.phone):'')+'</div>'+
+      '<div class="meta">活動：'+esc(r.eventCode||'-')+'</div>'+
       (r.intro?'<div class="intro">'+esc(r.intro)+'</div>':'')+
       '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
       (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
@@ -67,6 +73,45 @@ function render(res){
       '<div class="thumbs" id="ph-'+i+'"></div></div>';
   });
   $('panel').innerHTML=h;
+  loadEvents();
+}
+var EVENTS=[];
+function loadEvents(){
+  rpc('booth_admin_events',{admin_password:PW}).then(function(r){
+    if(!r||!r.ok){if($('ev-list'))$('ev-list').textContent='載入失敗';return;}
+    EVENTS=r.events||[];
+    var h='';
+    EVENTS.forEach(function(e){
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border)">'
+        +'<div><b style="font-size:13px;color:var(--ink)">'+esc(e.code)+'</b> <span style="font-size:12px">'+esc(e.name)+'</span>'
+        +'<div class="meta">期限 '+esc(e.deadline)+(e.deadlinePassed?'（已截止）':'')+' · '+e.count+' 家</div></div>'
+        +'<div style="white-space:nowrap"><a href="#" onclick="return editEvent(\''+esc(e.code)+'\')" style="font-size:12px;margin-right:10px">編輯</a>'
+        +'<a href="#" onclick="return delEvent(\''+esc(e.code)+'\')" style="font-size:12px;color:var(--blush)">刪除</a></div></div>';
+    });
+    $('ev-list').innerHTML = EVENTS.length?h:'<div class="meta">尚無活動</div>';
+  });
+}
+function editEvent(code){
+  var e=EVENTS.filter(function(x){return x.code===code;})[0]; if(!e)return false;
+  $('ev-code').value=e.code; $('ev-name').value=e.name; $('ev-deadline').value=e.deadline;
+  $('ev-msg').style.color='var(--ink-soft)'; $('ev-msg').textContent='編輯中：'+code+'（改完按下方按鈕）';
+  return false;
+}
+function saveEvent(){
+  var code=$('ev-code').value.trim(),name=$('ev-name').value.trim(),d=$('ev-deadline').value;
+  if(!code||!name||!d){$('ev-msg').style.color='var(--blush)';$('ev-msg').textContent='代碼／名稱／期限皆必填';return;}
+  rpc('booth_admin_event_save',{admin_password:PW,p_code:code,p_name:name,p_deadline:d+'T23:59:59+08:00'}).then(function(r){
+    if(!r||!r.ok){$('ev-msg').style.color='var(--blush)';$('ev-msg').textContent=(r&&r.error)||'失敗';return;}
+    $('ev-code').value='';$('ev-name').value='';$('ev-deadline').value='';$('ev-msg').textContent='';loadEvents();
+  });
+}
+function delEvent(code){
+  if(!confirm('確定刪除活動「'+code+'」？'))return false;
+  rpc('booth_admin_event_delete',{admin_password:PW,p_code:code}).then(function(r){
+    if(!r||!r.ok){alert((r&&r.error)||'刪除失敗');return;}
+    loadEvents();
+  });
+  return false;
 }
 function showPhotos(i){
   var a=$('pl-'+i); a.textContent='載入中…';
