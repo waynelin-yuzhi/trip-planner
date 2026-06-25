@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>攤位登記 · 管理檢視</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
+  :root{--paper:#F5F0E8;--cream:#FEFCF7;--linen:#EDE8DE;--ash:#B8B2A6;--ink:#2A2520;--ink-mid:#5A534C;--ink-soft:#8C857C;--sage:#8BA888;--sage-bg:#EFF4EE;--dust:#C9A97A;--dust-bg:#FAF3E8;--blush:#C4897A;--blush-bg:#FAF0EE;--border:rgba(90,83,76,.14);--border-m:rgba(90,83,76,.24);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);font-family:'Noto Sans TC',-apple-system,sans-serif;color:var(--ink);line-height:1.7;padding:18px 16px 60px;}
+  .wrap{max-width:560px;margin:0 auto;}
+  h1{font-size:18px;font-weight:500;margin-bottom:14px;}
+  .card{background:var(--cream);border:1px solid var(--border-m);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+  label{display:block;font-size:12px;font-weight:500;color:var(--ink-mid);margin-bottom:5px;}
+  input[type=password]{width:100%;border:1px solid var(--border-m);border-radius:7px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  .btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;background:var(--ink);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;}
+  .msg{font-size:12px;color:var(--blush);margin-top:8px;}
+  .sum{font-size:13px;}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:3px;background:var(--linen);color:var(--ink-soft);margin-right:4px;}
+  .tag.on{background:var(--blush-bg);color:#7A3E30;font-weight:500;}
+  .bn{font-size:15px;font-weight:500;}
+  .meta{font-size:11.5px;color:var(--ink-soft);}
+  .intro{font-size:13px;margin:6px 0;}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .thumb{width:84px;height:84px;border-radius:6px;overflow:hidden;border:1px solid var(--border-m);background:var(--linen);display:block;}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  a{color:var(--sage);}
+  .dl{font-size:11px;margin-top:3px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>攤位登記 · 管理檢視</h1>
+  <div class="card" id="login">
+    <label>管理者密碼</label>
+    <input type="password" id="apw" onkeydown="if(event.key==='Enter')go()">
+    <button class="btn" onclick="go()">登入</button>
+    <div class="msg" id="msg"></div>
+  </div>
+  <div id="panel"></div>
+</div>
+<script>
+var SB='https://ytlakkxrbookftluulbo.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bGFra3hyYm9va2Z0bHV1bGJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDY5MzcsImV4cCI6MjA5NzA4MjkzN30.2b9y-i9Y1niCXWgHFDhNhQ21COxtPde_AE4ixoIW2e4', PW='', ROWS=[];
+function rpc(fn,args){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)}).then(function(r){return r.json();});}
+function $(id){return document.getElementById(id);}
+function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function go(){$('msg').textContent='';var pw=$('apw').value;rpc('booth_admin_list',{admin_password:pw}).then(function(r){if(!r||!r.ok){$('msg').textContent=(r&&r.error)||'失敗';return;}PW=pw;render(r);}).catch(function(){$('msg').textContent='連線失敗';});}
+function render(res){
+  $('login').style.display='none';
+  ROWS=res.rows||[];
+  var water=ROWS.filter(function(r){return r.water;}).length;
+  var power=ROWS.filter(function(r){return r.power;}).length;
+  var dl=res.config&&res.config.deadline?new Date(res.config.deadline).toLocaleDateString('zh-TW'):'';
+  var h='<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b><div class="meta" style="margin-top:4px">統計截止：'+dl+(res.config&&res.config.deadlinePassed?'（已截止）':'')+'</div></div>';
+  if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
+  ROWS.forEach(function(r,i){
+    h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
+      '<div class="meta">'+esc(r.contact)+' · '+esc(r.email)+(r.phone?' · '+esc(r.phone):'')+'</div>'+
+      (r.intro?'<div class="intro">'+esc(r.intro)+'</div>':'')+
+      '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
+      (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
+      (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
+      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開／下載</a>':'')+'</div>'+
+      '<div class="thumbs" id="ph-'+i+'"></div></div>';
+  });
+  $('panel').innerHTML=h;
+}
+function showPhotos(i){
+  var a=$('pl-'+i); a.textContent='載入中…';
+  rpc('booth_admin_photos',{admin_password:PW,p_email:ROWS[i].email}).then(function(r){
+    if(!r||!r.ok){a.textContent='載入失敗';return;}
+    var photos=r.photos||[]; var brand=(r.brand||'攤位');
+    var h=''; photos.forEach(function(p,k){h+='<div><a class="thumb" href="'+p+'" target="_blank"><img src="'+p+'"></a><div class="dl"><a href="'+p+'" download="'+brand+'_'+(k+1)+'.jpg">下載</a></div></div>';});
+    $('ph-'+i).innerHTML=h; a.style.display='none';
+  }).catch(function(){a.textContent='載入失敗';});
+  return false;
+}
+</script>
+</body>
+</html>
