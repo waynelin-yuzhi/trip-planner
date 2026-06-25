@@ -49,13 +49,14 @@
     <div class="msg" id="msg"></div>
   </div>
   <div id="panel"></div>
-  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.0 · 2026.06.26</div>
+  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.1 · 2026.06.26</div>
 </div>
 <script>
 var SB='https://ytlakkxrbookftluulbo.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bGFra3hyYm9va2Z0bHV1bGJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDY5MzcsImV4cCI6MjA5NzA4MjkzN30.2b9y-i9Y1niCXWgHFDhNhQ21COxtPde_AE4ixoIW2e4', PW='', ROWS=[];
 function rpc(fn,args){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)}).then(function(r){return r.json();});}
 function $(id){return document.getElementById(id);}
 function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+var ICON='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M12 11v5M9.4 13.6 12 16l2.6-2.4"/></svg>';
 function go(){$('msg').textContent='';var pw=$('apw').value;rpc('booth_admin_list',{admin_password:pw}).then(function(r){if(!r||!r.ok){$('msg').textContent=(r&&r.error)||'失敗';return;}PW=pw;render(r);}).catch(function(){$('msg').textContent='連線失敗';});}
 function logout(){PW='';ROWS=[];$('apw').value='';$('panel').innerHTML='';$('login').style.display='block';$('msg').textContent='';window.scrollTo(0,0);}
 function render(res){
@@ -74,7 +75,7 @@ function render(res){
     +'<label>每家可上傳照片張數</label><input id="set-limit" type="number" min="1" max="20">'
     +'<label style="margin-top:8px">照片壓縮模式</label><select id="set-mode"><option value="print">高畫質（印刷／原圖級）</option><option value="a4">標準（A4 文宣）</option><option value="social">輕量（社群媒體）</option></select>'
     +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div>'
-    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">📦 打包全部品牌照片</button>':'')+'</div>';
+    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">'+ICON+'打包全部品牌照片</button>':'')+'</div>';
   if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
   ROWS.forEach(function(r,i){
     h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
@@ -84,7 +85,7 @@ function render(res){
       '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
       (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
       (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
-      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">📦 打包下載</a>':'')+'</div>'+
+      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">'+ICON+'打包下載</a>':'')+'</div>'+
       '<div class="thumbs" id="ph-'+i+'"></div>'+
       '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';
   });
@@ -156,14 +157,14 @@ function navLb(d){if(!LBset.length)return;LBidx=(LBidx+d+LBset.length)%LBset.len
 function closeLb(){$('lb').classList.remove('on');$('lb-img').src='';}
 function dlBlob(b,name){var u=URL.createObjectURL(b);var x=document.createElement('a');x.href=u;x.download=name;document.body.appendChild(x);x.click();x.remove();setTimeout(function(){URL.revokeObjectURL(u);},2000);}
 function safeName(s){return (s||'品牌').replace(/[\\/:*?"<>|]/g,'_');}
-function zipBrand(i,a){var r=ROWS[i];if(!r||!r.photoCount)return false;var t0=a.textContent;a.textContent='打包中…';
+function zipBrand(i,a){var r=ROWS[i];if(!r||!r.photoCount)return false;var t0=a.innerHTML;a.textContent='打包中…';
   rpc('booth_admin_photos',{admin_password:PW,p_email:r.email}).then(function(res){
-    if(!res||!res.ok){alert('讀取失敗');a.textContent=t0;return;}
+    if(!res||!res.ok){alert('讀取失敗');a.innerHTML=t0;return;}
     var zip=new JSZip();(res.photos||[]).forEach(function(p,k){var m=/base64,(.+)$/.exec(p);if(m)zip.file(safeName(r.brand)+'_'+(k+1)+'.jpg',m[1],{base64:true});});
-    zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,safeName(r.brand)+'.zip');a.textContent=t0;});
+    zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,safeName(r.brand)+'.zip');a.innerHTML=t0;});
   });return false;}
-function zipAll(btn){if(!ROWS.length)return;btn.disabled=true;var orig=btn.textContent,zip=new JSZip(),done=0,total=ROWS.length;
-  (function step(){if(done>=total){btn.textContent='產生壓縮檔…';zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,'全部品牌照片.zip');btn.disabled=false;btn.textContent=orig;});return;}
+function zipAll(btn){if(!ROWS.length)return;btn.disabled=true;var orig=btn.innerHTML,zip=new JSZip(),done=0,total=ROWS.length;
+  (function step(){if(done>=total){btn.textContent='產生壓縮檔…';zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,'全部品牌照片.zip');btn.disabled=false;btn.innerHTML=orig;});return;}
     var r=ROWS[done];btn.textContent='打包中 '+(done+1)+'/'+total+'…';
     if(!r.photoCount){done++;step();return;}
     rpc('booth_admin_photos',{admin_password:PW,p_email:r.email}).then(function(res){
