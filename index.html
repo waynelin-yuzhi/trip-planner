@@ -240,12 +240,6 @@
   }
   .pick-row:first-of-type { border-top: none; }
   .pick-row:hover { background: var(--linen); }
-  .pick-row > span:last-child { flex: 1; }
-  .pick-row::after {
-    content: '↓'; flex-shrink: 0; align-self: center;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ash);
-  }
-  .pick-row:hover::after { color: var(--ink-mid); }
   .pick-tag {
     flex-shrink: 0;
     font-family: 'JetBrains Mono', monospace;
@@ -448,7 +442,7 @@
 
     <!-- 怎麼選 -->
     <div class="pick-box">
-      <div class="pick-title">怎麼選 · 布拉格 → Łódź　（點一行直接跳到該方案 ↓）</div>
+      <div class="pick-title">怎麼選 · 布拉格 → Łódź　（點一行跳到該方案）</div>
       <div class="pick-row" onclick="jumpToOpt('out',1)">
         <span class="pick-tag tag-save">最省錢</span>
         <span><b>方案 2</b> FlixBus 直達 · €31/人 · 9h · 21:25 到</span>
@@ -782,7 +776,7 @@
 
     <!-- 怎麼選 -->
     <div class="pick-box">
-      <div class="pick-title">怎麼選 · Łódź → 布拉格機場　（點一行直接跳到該方案 ↓）</div>
+      <div class="pick-title">怎麼選 · Łódź → 布拉格機場　（點一行跳到該方案）</div>
       <div class="pick-row" onclick="jumpToOpt('ret',0)">
         <span class="pick-tag tag-save">最省錢</span>
         <span><b>方案 1</b> FlixBus 直達 · €30.98/人 · 車上過夜 · 抵達後僅 2h35 緩衝</span>
