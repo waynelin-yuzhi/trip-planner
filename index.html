@@ -205,6 +205,36 @@
     font-weight: 500;
   }
 
+  /* ── 怎麼選（條列） ── */
+  .pick-box {
+    background: var(--cream);
+    border: 1px solid var(--border-m);
+    border-radius: 10px;
+    padding: 13px 15px; margin-bottom: 22px;
+  }
+  .pick-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--ash); margin-bottom: 11px;
+  }
+  .pick-row {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 8px 0; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--ink-mid); line-height: 1.5;
+  }
+  .pick-row:first-of-type { border-top: none; padding-top: 0; }
+  .pick-tag {
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: .03em; font-weight: 500;
+    padding: 3px 8px; border-radius: 3px; white-space: nowrap; margin-top: 1px;
+  }
+  .pick-row b { color: var(--ink); font-weight: 600; }
+  .tag-save { background: var(--sage-bg);  color: var(--sage); }
+  .tag-fast { background: var(--sky-bg);   color: var(--sky); }
+  .tag-easy { background: var(--dust-bg);  color: var(--dust); }
+  .tag-skip { background: var(--blush-bg); color: var(--blush); }
+
   .opt-body { padding: 14px 16px; }
 
   /* ── 時間軸 ── */
@@ -390,6 +420,27 @@
 
   <!-- ════ 去程 ════ -->
   <div class="panel active" id="panel-out">
+
+    <!-- 怎麼選 -->
+    <div class="pick-box">
+      <div class="pick-title">怎麼選 · 布拉格 → Łódź</div>
+      <div class="pick-row">
+        <span class="pick-tag tag-save">最省錢</span>
+        <span><b>方案 2</b> FlixBus 直達 · €31/人 · 9h · 21:25 到</span>
+      </div>
+      <div class="pick-row">
+        <span class="pick-tag tag-fast">最快到</span>
+        <span><b>方案 3</b> 轉華沙（LO528＋火車）· 約 16:30 到 · NT$10,000＋/人</span>
+      </div>
+      <div class="pick-row">
+        <span class="pick-tag tag-easy">最省事</span>
+        <span><b>方案 4</b> 包車兩台八人座 · 門到門全程同行 · 7h · NT$10,848/人</span>
+      </div>
+      <div class="pick-row">
+        <span class="pick-tag tag-skip">不建議</span>
+        <span><b>方案 1</b> 飛機繞道都柏林 · 最久最貴</span>
+      </div>
+    </div>
 
     <!-- 班機 -->
     <div class="flight-card">
@@ -699,14 +750,23 @@
       </div>
     </div>
 
-    <div class="notice">
-      <b>怎麼選：</b>最省 → <b>方案 2</b>（巴士直達，€31 / 人、9h，21:25 到）；想最快到、不在意多花 → <b>方案 3</b>（轉華沙，約 16:30）或 <b>方案 4</b>（包車門到門，€3,600／12 人約 NT$10,848，7h、全程同行最省事）。方案 1 繞道都柏林，最不划算。
-    </div>
-
   </div>
 
   <!-- ════ 回程 ════ -->
   <div class="panel" id="panel-ret">
+
+    <!-- 怎麼選 -->
+    <div class="pick-box">
+      <div class="pick-title">怎麼選 · Łódź → 布拉格機場</div>
+      <div class="pick-row">
+        <span class="pick-tag tag-save">最省錢</span>
+        <span><b>方案 1</b> FlixBus 直達 · €30.98/人 · 車上過夜 · 抵達後僅 2h35 緩衝</span>
+      </div>
+      <div class="pick-row">
+        <span class="pick-tag tag-fast">提前到</span>
+        <span><b>方案 2</b> 火車＋飛機 · 前一晚到布拉格 · 機場過夜 · NT$7,060＋/人</span>
+      </div>
+    </div>
 
     <!-- 已確認帶 -->
     <div class="conf-strip">
@@ -894,10 +954,6 @@
           查火車票（Łódź → 華沙）
         </a>
       </div>
-    </div>
-
-    <div class="notice">
-      <b>怎麼選：</b>省錢 → <b>方案 1</b>（FlixBus 直達，€30.98 / 人、車上過夜；抵達後僅 2h35 緩衝，下車勿逗留直接進 T1）；想前一晚先到布拉格、不趕早班 → <b>方案 2</b>（火車+飛機，機票 NT$7,060 起、機場過夜）。
     </div>
 
   </div>
