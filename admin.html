@@ -46,13 +46,15 @@ function rpc(fn,args){return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:
 function $(id){return document.getElementById(id);}
 function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 function go(){$('msg').textContent='';var pw=$('apw').value;rpc('booth_admin_list',{admin_password:pw}).then(function(r){if(!r||!r.ok){$('msg').textContent=(r&&r.error)||'失敗';return;}PW=pw;render(r);}).catch(function(){$('msg').textContent='連線失敗';});}
+function logout(){PW='';ROWS=[];$('apw').value='';$('panel').innerHTML='';$('login').style.display='block';$('msg').textContent='';window.scrollTo(0,0);}
 function render(res){
   $('login').style.display='none';
   ROWS=res.rows||[];
   var water=ROWS.filter(function(r){return r.water;}).length;
   var power=ROWS.filter(function(r){return r.power;}).length;
   var dl=res.config&&res.config.deadline?new Date(res.config.deadline).toLocaleDateString('zh-TW'):'';
-  var h='<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b><div class="meta" style="margin-top:4px">統計截止：'+dl+(res.config&&res.config.deadlinePassed?'（已截止）':'')+'</div></div>';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a href="index.html" style="font-size:12px;color:var(--ink-mid);text-decoration:none">← 返回主頁</a><button onclick="logout()" style="font-size:12px;padding:6px 13px;border:1px solid var(--border-m);border-radius:6px;background:var(--cream);color:var(--ink-mid);cursor:pointer;font-family:inherit">登出</button></div>'
+    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b><div class="meta" style="margin-top:4px">統計截止：'+dl+(res.config&&res.config.deadlinePassed?'（已截止）':'')+'</div></div>';
   if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
   ROWS.forEach(function(r,i){
     h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
