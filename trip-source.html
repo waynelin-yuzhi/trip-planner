@@ -75,10 +75,23 @@
     padding: 12px 0; margin-bottom: 14px;
   }
   .tabs {
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     border: 1px solid var(--border-m);
     border-radius: 6px; overflow: hidden;
   }
+  .booth-cta {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; margin-bottom: 16px; padding: 13px 16px;
+    border: none; border-radius: 8px; text-align: left;
+    background: var(--ink); color: var(--cream);
+    font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: all .18s;
+  }
+  .booth-cta .bc-main { display:block; font-size: 14px; font-weight: 500; letter-spacing: .05em; }
+  .booth-cta .bc-sub { display:block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.6); margin-top: 2px; }
+  .booth-cta .bc-arrow { font-size: 17px; color: rgba(255,255,255,.7); flex-shrink: 0; }
+  .booth-cta.on { background: var(--sage); }
+  .booth-cta.on .bc-sub { color: rgba(255,255,255,.85); }
+  .booth-cta.on .bc-arrow { color: rgba(255,255,255,.9); }
   .tab-btn {
     padding: 10px 4px;
     background: var(--cream); border: none;
@@ -428,13 +441,17 @@
   </div>
 
   <!-- Tab -->
+  <button class="booth-cta" id="boothCta" onclick="showBooth()">
+    <span><span class="bc-main">攤位登記</span><span class="bc-sub">填寫 / 修改你的攤位資料</span></span>
+    <span class="bc-arrow">→</span>
+  </button>
+
   <div class="tabs-bar">
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('out', this)">去程</button>
       <button class="tab-btn" onclick="switchTab('ret', this)">回程</button>
       <button class="tab-btn" onclick="switchTab('hotel', this)">住宿</button>
-      <button class="tab-btn" onclick="switchTab('expo', this)">布展資訊</button>
-      <button class="tab-btn" onclick="switchTab('booth', this)">攤位登記</button>
+      <button class="tab-btn" onclick="switchTab('expo', this)">布展</button>
     </div>
   </div>
 
@@ -1187,6 +1204,14 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('panel-' + id).classList.add('active');
   btn.classList.add('active');
+  var bc = document.getElementById('boothCta'); if (bc) bc.classList.remove('on');
+}
+function showBooth() {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('panel-booth').classList.add('active');
+  var bc = document.getElementById('boothCta'); if (bc) bc.classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function jumpToOpt(panel, idx) {
   var cards = document.getElementById('panel-' + panel).querySelectorAll('.opt-card');
