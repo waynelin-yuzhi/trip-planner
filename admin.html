@@ -13,7 +13,7 @@
   h1{font-size:18px;font-weight:500;margin-bottom:14px;}
   .card{background:var(--cream);border:1px solid var(--border-m);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
   label{display:block;font-size:12px;font-weight:500;color:var(--ink-mid);margin-bottom:5px;}
-  input{width:100%;border:1px solid var(--border-m);border-radius:7px;padding:9px 11px;font-size:14px;font-family:inherit;}
+  input,select{width:100%;border:1px solid var(--border-m);border-radius:7px;padding:9px 11px;font-size:14px;font-family:inherit;background:#fff;}
   .btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;background:var(--ink);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;}
   .msg{font-size:12px;color:var(--blush);margin-top:8px;}
   .sum{font-size:13px;}
@@ -37,6 +37,7 @@
   .lb-prev{left:-14px;} .lb-next{right:-14px;}
   .lb-count{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -68,7 +69,11 @@ function render(res){
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="ev-code" placeholder="活動代碼"><input id="ev-name" placeholder="活動名稱"></div>'
     +'<label style="margin-top:8px">資料上傳期限</label><input id="ev-deadline" type="date">'
     +'<button class="btn" onclick="saveEvent()">新增 / 更新活動</button><div class="msg" id="ev-msg"></div></div></div>'
-    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b></div>';
+    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">全域設定</div>'
+    +'<label>每家可上傳照片張數</label><input id="set-limit" type="number" min="1" max="20">'
+    +'<label style="margin-top:8px">照片壓縮模式</label><select id="set-mode"><option value="print">高畫質（印刷／原圖級）</option><option value="a4">標準（A4 文宣）</option><option value="social">輕量（社群媒體）</option></select>'
+    +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div>'
+    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">📦 打包全部品牌照片</button>':'')+'</div>';
   if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
   ROWS.forEach(function(r,i){
     h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
@@ -78,12 +83,12 @@ function render(res){
       '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
       (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
       (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
-      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開／下載</a>':'')+'</div>'+
+      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">📦 打包下載</a>':'')+'</div>'+
       '<div class="thumbs" id="ph-'+i+'"></div>'+
       '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';
   });
   $('panel').innerHTML=h;
-  loadEvents();
+  loadEvents(); loadSettings();
 }
 var EVENTS=[];
 function loadEvents(){
@@ -143,11 +148,30 @@ function showPhotos(i){
   }).catch(function(){a.textContent='載入失敗';});
   return false;
 }
-var PSETS={},LBset=[],LBidx=0;
-function openLb(i,k){LBset=PSETS[i]||[];LBidx=k;showLb();return false;}
-function showLb(){if(!LBset.length)return;$('lb-img').src=LBset[LBidx];$('lb-count').textContent=(LBidx+1)+' / '+LBset.length;var multi=LBset.length>1;document.querySelector('.lb-prev').style.display=multi?'block':'none';document.querySelector('.lb-next').style.display=multi?'block':'none';$('lb').classList.add('on');}
+var PSETS={},LBset=[],LBidx=0,LBbrand='';
+function openLb(i,k){LBset=PSETS[i]||[];LBidx=k;LBbrand=(ROWS[i]&&ROWS[i].brand)||'品牌';showLb();return false;}
+function showLb(){if(!LBset.length)return;$('lb-img').src=LBset[LBidx];$('lb-count').textContent=(LBidx+1)+' / '+LBset.length;var dl=$('lb-dl');if(dl){dl.href=LBset[LBidx];dl.download=LBbrand+'_'+(LBidx+1)+'.jpg';}var multi=LBset.length>1;document.querySelector('.lb-prev').style.display=multi?'block':'none';document.querySelector('.lb-next').style.display=multi?'block':'none';$('lb').classList.add('on');}
 function navLb(d){if(!LBset.length)return;LBidx=(LBidx+d+LBset.length)%LBset.length;showLb();}
 function closeLb(){$('lb').classList.remove('on');$('lb-img').src='';}
+function dlBlob(b,name){var u=URL.createObjectURL(b);var x=document.createElement('a');x.href=u;x.download=name;document.body.appendChild(x);x.click();x.remove();setTimeout(function(){URL.revokeObjectURL(u);},2000);}
+function safeName(s){return (s||'品牌').replace(/[\\/:*?"<>|]/g,'_');}
+function zipBrand(i,a){var r=ROWS[i];if(!r||!r.photoCount)return false;var t0=a.textContent;a.textContent='打包中…';
+  rpc('booth_admin_photos',{admin_password:PW,p_email:r.email}).then(function(res){
+    if(!res||!res.ok){alert('讀取失敗');a.textContent=t0;return;}
+    var zip=new JSZip();(res.photos||[]).forEach(function(p,k){var m=/base64,(.+)$/.exec(p);if(m)zip.file(safeName(r.brand)+'_'+(k+1)+'.jpg',m[1],{base64:true});});
+    zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,safeName(r.brand)+'.zip');a.textContent=t0;});
+  });return false;}
+function zipAll(btn){if(!ROWS.length)return;btn.disabled=true;var orig=btn.textContent,zip=new JSZip(),done=0,total=ROWS.length;
+  (function step(){if(done>=total){btn.textContent='產生壓縮檔…';zip.generateAsync({type:'blob'}).then(function(b){dlBlob(b,'全部品牌照片.zip');btn.disabled=false;btn.textContent=orig;});return;}
+    var r=ROWS[done];btn.textContent='打包中 '+(done+1)+'/'+total+'…';
+    if(!r.photoCount){done++;step();return;}
+    rpc('booth_admin_photos',{admin_password:PW,p_email:r.email}).then(function(res){
+      if(res&&res.ok){var f=zip.folder(safeName(r.brand));(res.photos||[]).forEach(function(p,k){var m=/base64,(.+)$/.exec(p);if(m)f.file((k+1)+'.jpg',m[1],{base64:true});});}
+      done++;step();
+    }).catch(function(){done++;step();});
+  })();}
+function loadSettings(){rpc('booth_admin_settings',{admin_password:PW}).then(function(r){if(!r||!r.ok)return;if($('set-limit'))$('set-limit').value=r.photoLimit;if($('set-mode'))$('set-mode').value=r.compressMode;});}
+function saveSettings(){var l=parseInt($('set-limit').value,10),m=$('set-mode').value,x=$('set-msg');rpc('booth_admin_set_config',{admin_password:PW,p_limit:l,p_mode:m}).then(function(r){if(!r||!r.ok){x.style.color='var(--blush)';x.textContent=(r&&r.error)||'失敗';return;}x.style.color='var(--sage)';x.textContent='已儲存';setTimeout(function(){x.textContent='';},2000);});}
 </script>
 <div id="lb" onclick="closeLb()">
   <div class="lb-box" onclick="event.stopPropagation()">
@@ -155,7 +179,7 @@ function closeLb(){$('lb').classList.remove('on');$('lb-img').src='';}
     <span class="lb-nav lb-prev" onclick="navLb(-1)">‹</span>
     <img id="lb-img" alt="">
     <span class="lb-nav lb-next" onclick="navLb(1)">›</span>
-    <div class="lb-count" id="lb-count"></div>
+    <div class="lb-count"><span id="lb-count"></span> · <a id="lb-dl" download>下載這張</a></div>
   </div>
 </div>
 </body>
