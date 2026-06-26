@@ -17,6 +17,10 @@
   .btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;background:var(--ink);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;}
   .msg{font-size:12px;color:var(--blush);margin-top:8px;}
   .sum{font-size:13px;}
+  .atabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-m);border-radius:7px;overflow:hidden;margin-bottom:14px;}
+  .atab{padding:9px;border:none;background:var(--cream);font-family:inherit;font-size:13px;color:var(--ink-soft);cursor:pointer;border-right:1px solid var(--border-m);}
+  .atab:last-child{border-right:none;}
+  .atab.on{background:var(--ink);color:var(--cream);font-weight:500;}
   .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:3px;background:var(--linen);color:var(--ink-soft);margin-right:4px;}
   .tag.on{background:var(--blush-bg);color:#7A3E30;font-weight:500;}
   .bn{font-size:15px;font-weight:500;}
@@ -49,7 +53,7 @@
     <div class="msg" id="msg"></div>
   </div>
   <div id="panel"></div>
-  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.2 · 2026.06.26</div>
+  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.3 · 2026.06.26</div>
 </div>
 <script>
 var SB='https://ytlakkxrbookftluulbo.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bGFra3hyYm9va2Z0bHV1bGJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDY5MzcsImV4cCI6MjA5NzA4MjkzN30.2b9y-i9Y1niCXWgHFDhNhQ21COxtPde_AE4ixoIW2e4', PW='', ROWS=[];
@@ -64,8 +68,15 @@ function render(res){
   ROWS=res.rows||[];
   var water=ROWS.filter(function(r){return r.water;}).length;
   var power=ROWS.filter(function(r){return r.power;}).length;
-  var dl=res.config&&res.config.deadline?new Date(res.config.deadline).toLocaleDateString('zh-TW'):'';
+  var codes=[]; ROWS.forEach(function(r){if(r.eventCode&&codes.indexOf(r.eventCode)<0)codes.push(r.eventCode);});
+  var fopts='<option value="">全部活動（'+ROWS.length+'）</option>'+codes.map(function(c){var n=ROWS.filter(function(r){return r.eventCode===c;}).length;return '<option value="'+esc(c)+'">'+esc(c)+'（'+n+'）</option>';}).join('');
   var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a href="index.html" style="font-size:12px;color:var(--ink-mid);text-decoration:none">← 返回主頁</a><button onclick="logout()" style="font-size:12px;padding:6px 13px;border:1px solid var(--border-m);border-radius:6px;background:var(--cream);color:var(--ink-mid);cursor:pointer;font-family:inherit">登出</button></div>'
+    +'<div class="atabs"><button class="atab on" id="atab-b" onclick="aTab(\'b\')">品牌資料</button><button class="atab" id="atab-s" onclick="aTab(\'s\')">活動與設定</button></div>'
+    +'<div id="pane-b">'
+    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">'+ICON+'打包全部品牌照片</button>':'')+'</div>'
+    +(ROWS.length?'<label style="margin-bottom:4px">依活動篩選</label><select id="ev-filter" onchange="renderBrands(this.value)" style="margin-bottom:12px">'+fopts+'</select>':'')
+    +'<div id="brand-list"></div></div>'
+    +'<div id="pane-s" style="display:none">'
     +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">活動管理</div><div id="ev-list" class="meta">載入中…</div>'
     +'<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="ev-code" placeholder="活動代碼"><input id="ev-name" placeholder="活動名稱"></div>'
@@ -74,24 +85,27 @@ function render(res){
     +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">全域設定</div>'
     +'<label>每家可上傳照片張數</label><input id="set-limit" type="number" min="1" max="20">'
     +'<label style="margin-top:8px">照片壓縮模式</label><select id="set-mode"><option value="print">高畫質（印刷／原圖級）</option><option value="a4">標準（A4 文宣）</option><option value="social">輕量（社群媒體）</option></select>'
-    +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div>'
-    +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">'+ICON+'打包全部品牌照片</button>':'')+'</div>';
-  if(!ROWS.length)h+='<div class="card meta">目前還沒有品牌登記。</div>';
-  ROWS.forEach(function(r,i){
-    h+='<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
-      '<div class="meta">'+esc(r.contact)+' · '+esc(r.email)+(r.phone?' · '+esc(r.phone):'')+'</div>'+
-      '<div class="meta">活動：'+esc(r.eventCode||'-')+'</div>'+
-      (r.intro?'<div class="intro">'+esc(r.intro)+'</div>':'')+
-      '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
-      (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
-      (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
-      '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">'+ICON+'打包下載</a>':'')+'</div>'+
-      '<div class="thumbs" id="ph-'+i+'"></div>'+
-      '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';
-  });
+    +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div></div>';
   $('panel').innerHTML=h;
+  renderBrands('');
   loadEvents(); loadSettings();
 }
+function aTab(w){var b=w==='b';$('atab-b').classList.toggle('on',b);$('atab-s').classList.toggle('on',!b);$('pane-b').style.display=b?'block':'none';$('pane-s').style.display=b?'none':'block';}
+function brandCard(r,i){return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
+  '<div class="meta">'+esc(r.contact)+' · '+esc(r.email)+(r.phone?' · '+esc(r.phone):'')+'</div>'+
+  '<div class="meta">活動：'+esc(r.eventCode||'-')+'</div>'+
+  (r.intro?'<div class="intro">'+esc(r.intro)+'</div>':'')+
+  '<div style="margin:6px 0"><span class="tag '+(r.water?'on':'')+'">水源：'+(r.water?'需要':'否')+'</span><span class="tag '+(r.power?'on':'')+'">額外電力：'+(r.power?'需要':'否')+'</span></div>'+
+  (r.powerDetail?'<div class="meta">電力說明：'+esc(r.powerDetail)+'</div>':'')+
+  (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
+  '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">'+ICON+'打包下載</a>':'')+'</div>'+
+  '<div class="thumbs" id="ph-'+i+'"></div>'+
+  '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';}
+function renderBrands(code){var rows=code?ROWS.filter(function(r){return r.eventCode===code;}):ROWS;var h='';
+  if(!ROWS.length)h='<div class="card meta">目前還沒有品牌登記。</div>';
+  else if(!rows.length)h='<div class="card meta">此活動沒有品牌。</div>';
+  else rows.forEach(function(r){h+=brandCard(r,ROWS.indexOf(r));});
+  $('brand-list').innerHTML=h;}
 var EVENTS=[];
 function loadEvents(){
   rpc('booth_admin_events',{admin_password:PW}).then(function(r){
