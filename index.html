@@ -263,6 +263,30 @@
   .tag-easy { background: var(--dust-bg);  color: var(--dust); }
   .tag-skip { background: var(--blush-bg); color: var(--blush); }
 
+  /* ── 怎麼選（文件夾頁籤） ── */
+  .pick-folder { margin-bottom: 16px; }
+  .pf-tabs { display: flex; gap: 3px; }
+  .pf-tab {
+    flex: 1; padding: 7px 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+    color: var(--ink-soft); background: var(--linen);
+    border: 1px solid var(--border-m); border-top: 2px solid transparent; border-bottom: 1px solid var(--border-m);
+    border-radius: 7px 7px 0 0; cursor: pointer; transition: color .15s, background .15s;
+  }
+  .pf-tab.on { background: var(--cream); color: var(--ink); border-bottom-color: var(--cream); position: relative; z-index: 2; }
+  .pf-tab.on.pf-save { color: var(--sage);  border-top-color: var(--sage); }
+  .pf-tab.on.pf-fast { color: var(--sky);   border-top-color: var(--sky); }
+  .pf-tab.on.pf-easy { color: var(--dust);  border-top-color: var(--dust); }
+  .pf-tab.on.pf-skip { color: var(--blush); border-top-color: var(--blush); }
+  .pick-body {
+    background: var(--cream); border: 1px solid var(--border-m); border-radius: 0 0 8px 8px;
+    padding: 13px 15px; margin-top: -1px; font-size: 12px; color: var(--ink-mid); line-height: 1.6;
+  }
+  .pf-pane { display: none; }
+  .pf-pane.on { display: block; }
+  .pick-body b { color: var(--ink); font-weight: 600; }
+  .pick-body a { color: var(--sage); font-size: 11.5px; cursor: pointer; white-space: nowrap; }
+
   .opt-body { padding: 14px 16px; }
 
   /* ── 時間軸 ── */
@@ -494,23 +518,18 @@
   <div class="panel active" id="panel-out">
 
     <!-- 怎麼選 -->
-    <div class="pick-box">
-      <div class="pick-title">怎麼選 · 布拉格 → Łódź　（點一行跳到該方案）</div>
-      <div class="pick-row" onclick="jumpToOpt('out',1)">
-        <span class="pick-tag tag-save">最省錢</span>
-        <span><b>方案 2</b> FlixBus 直達 · €31/人 · 9h · 21:25 到</span>
+    <div class="pick-folder">
+      <div class="pf-tabs">
+        <button class="pf-tab pf-save on" onclick="pickTab('out',0,this)">最省錢</button>
+        <button class="pf-tab pf-fast" onclick="pickTab('out',1,this)">最快到</button>
+        <button class="pf-tab pf-easy" onclick="pickTab('out',2,this)">最省事</button>
+        <button class="pf-tab pf-skip" onclick="pickTab('out',3,this)">不建議</button>
       </div>
-      <div class="pick-row" onclick="jumpToOpt('out',2)">
-        <span class="pick-tag tag-fast">最快到</span>
-        <span><b>方案 3</b> 轉華沙（LO528＋火車）· 約 16:30 到 · NT$10,000＋/人</span>
-      </div>
-      <div class="pick-row" onclick="jumpToOpt('out',3)">
-        <span class="pick-tag tag-easy">最省事</span>
-        <span><b>方案 4</b> 包車兩台八人座 · 門到門全程同行 · 7h · NT$10,848/人</span>
-      </div>
-      <div class="pick-row" onclick="jumpToOpt('out',0)">
-        <span class="pick-tag tag-skip">不建議</span>
-        <span><b>方案 1</b> 飛機繞道都柏林 · 最久最貴</span>
+      <div class="pick-body">
+        <div class="pf-pane on"><b>方案 2</b> FlixBus 直達 · €31/人 · 9h · 21:25 到　<a onclick="jumpToOpt('out',1)">看詳情 ↓</a></div>
+        <div class="pf-pane"><b>方案 3</b> 轉華沙（LO528＋火車）· 約 16:30 到 · NT$10,000＋/人　<a onclick="jumpToOpt('out',2)">看詳情 ↓</a></div>
+        <div class="pf-pane"><b>方案 4</b> 包車兩台八人座 · 門到門全程同行 · 7h · NT$10,848/人　<a onclick="jumpToOpt('out',3)">看詳情 ↓</a></div>
+        <div class="pf-pane"><b>方案 1</b> 飛機繞道都柏林 · 最久最貴　<a onclick="jumpToOpt('out',0)">看詳情 ↓</a></div>
       </div>
     </div>
 
@@ -828,15 +847,14 @@
   <div class="panel" id="panel-ret">
 
     <!-- 怎麼選 -->
-    <div class="pick-box">
-      <div class="pick-title">怎麼選 · Łódź → 布拉格機場　（點一行跳到該方案）</div>
-      <div class="pick-row" onclick="jumpToOpt('ret',0)">
-        <span class="pick-tag tag-save">最省錢</span>
-        <span><b>方案 1</b> FlixBus 直達 · €30.98/人 · 車上過夜 · 抵達後僅 2h35 緩衝</span>
+    <div class="pick-folder">
+      <div class="pf-tabs">
+        <button class="pf-tab pf-save on" onclick="pickTab('ret',0,this)">最省錢</button>
+        <button class="pf-tab pf-fast" onclick="pickTab('ret',1,this)">提前到</button>
       </div>
-      <div class="pick-row" onclick="jumpToOpt('ret',1)">
-        <span class="pick-tag tag-fast">提前到</span>
-        <span><b>方案 2</b> 火車＋飛機 · 前一晚到布拉格 · 機場過夜 · NT$7,060＋/人</span>
+      <div class="pick-body">
+        <div class="pf-pane on"><b>方案 1</b> FlixBus 直達 · €30.98/人 · 車上過夜 · 抵達後僅 2h35 緩衝　<a onclick="jumpToOpt('ret',0)">看詳情 ↓</a></div>
+        <div class="pf-pane"><b>方案 2</b> 火車＋飛機 · 前一晚到布拉格 · 機場過夜 · NT$7,060＋/人　<a onclick="jumpToOpt('ret',1)">看詳情 ↓</a></div>
       </div>
     </div>
 
@@ -1308,7 +1326,7 @@
 
   <div style="text-align:center;margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
     <a href="admin.html" style="font-size:10px;color:var(--ash);letter-spacing:.12em;text-decoration:none;">主辦管理 →</a>
-    <div style="font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:6px;">v1.4 · 2026.06.26</div>
+    <div style="font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:6px;">v1.5 · 2026.06.26</div>
   </div>
 
 </div>
@@ -1328,6 +1346,7 @@ function showBooth() {
   var bc = document.getElementById('boothCta'); if (bc) bc.classList.add('on');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+function pickTab(panel, idx, btn){var f=btn.closest('.pick-folder');f.querySelectorAll('.pf-tab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');var ps=f.querySelectorAll('.pf-pane');for(var i=0;i<ps.length;i++)ps[i].classList.toggle('on',i===idx);}
 function jumpToOpt(panel, idx) {
   var cards = document.getElementById('panel-' + panel).querySelectorAll('.opt-card');
   var el = cards[idx];
