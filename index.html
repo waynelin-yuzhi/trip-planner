@@ -1321,12 +1321,18 @@
       </div>
       <button class="bf-btn" id="bf-saveBtn">儲存</button>
       <div id="bf-status"></div>
+      <div class="bf-card" style="margin-top:14px">
+        <label>修改登入密碼（選填）</label>
+        <input type="password" id="bf-newpw" placeholder="新密碼，至少 4 碼">
+        <button class="bf-btn ghost" id="bf-pwbtn" style="margin-top:10px">更新密碼</button>
+        <div class="bf-note" id="bf-pwmsg" style="display:none"></div>
+      </div>
     </div>
   </div>
 
   <div style="text-align:center;margin-top:26px;padding-top:16px;border-top:1px solid var(--border);">
     <a href="admin.html" style="font-size:10px;color:var(--ash);letter-spacing:.12em;text-decoration:none;">主辦管理 →</a>
-    <div style="font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:6px;">v1.5 · 2026.06.26</div>
+    <div style="font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:6px;">v1.6 · 2026.07.02</div>
   </div>
 
 </div>
@@ -1380,6 +1386,7 @@ function jumpToOpt(panel, idx) {
   window.bfRmE=function(i){EX.splice(i,1);thumbs();};
   window.bfRmN=function(i){NW.splice(i,1);thumbs();};
   $('bf-saveBtn').onclick=function(){if(!$('bf-brand').value.trim())return alert('請填品牌名稱');this.disabled=true;$('bf-status').textContent='儲存中…';var b=this;var args={p_email:SESS.email,p_password:SESS.password,p_brand:$('bf-brand').value.trim(),p_contact:$('bf-contact').value.trim(),p_phone:$('bf-phone').value.trim(),p_intro:$('bf-intro').value.trim(),p_note:$('bf-note').value.trim(),p_water:gr('bf-water'),p_power:gr('bf-power'),p_power_detail:$('bf-powerDetail').value.trim(),p_photos:EX.concat(NW)};rpc('booth_save',args).then(function(r){b.disabled=false;if(!r||!r.ok){$('bf-status').textContent='';return alert((r&&r.error)||'儲存失敗');}fill(r.data);$('bf-status').innerHTML='<div class="bf-note ok">已儲存！</div>';setTimeout(function(){$('bf-status').innerHTML='';},2500);}).catch(function(){b.disabled=false;$('bf-status').textContent='';alert('連線失敗，請重試');});};
+  $('bf-pwbtn').onclick=function(){var np=$('bf-newpw').value,m=$('bf-pwmsg');function show(cls,t){m.style.display='block';m.className='bf-note '+cls;m.textContent=t;}if(!np||np.length<4)return show('warn','新密碼至少 4 碼');this.disabled=true;var b=this;rpc('booth_change_password',{p_email:SESS.email,p_password:SESS.password,p_new_password:np}).then(function(r){b.disabled=false;if(!r||!r.ok)return show('warn',(r&&r.error)||'更新失敗');SESS.password=np;$('bf-newpw').value='';show('ok','密碼已更新，下次請用新密碼登入');}).catch(function(){b.disabled=false;show('warn','連線失敗，請重試');});};
   window.bfLogout=function(){SESS=null;EX=[];NW=[];$('bf-edit').style.display='none';$('bf-auth').style.display='block';$('bf-lPwd').value='';window.bfTab('login');setCta('品牌登記','填寫 / 修改你的品牌資料');};
 })();
 </script>

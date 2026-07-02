@@ -53,7 +53,7 @@
     <div class="msg" id="msg"></div>
   </div>
   <div id="panel"></div>
-  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.5 · 2026.06.26</div>
+  <div style="text-align:center;font-size:9px;color:var(--ash);letter-spacing:.12em;margin-top:18px;">v1.6 · 2026.07.02</div>
 </div>
 <script>
 var SB='https://ytlakkxrbookftluulbo.supabase.co', KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0bGFra3hyYm9va2Z0bHV1bGJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDY5MzcsImV4cCI6MjA5NzA4MjkzN30.2b9y-i9Y1niCXWgHFDhNhQ21COxtPde_AE4ixoIW2e4', PW='', ROWS=[];
@@ -100,7 +100,7 @@ function brandCard(r,i){return '<div class="card"><div style="display:flex;justi
   (r.note?'<div class="meta">備註：'+esc(r.note)+'</div>':'')+
   '<div class="meta" style="margin-top:6px">照片 '+r.photoCount+' 張'+(r.photoCount?' · <a href="#" id="pl-'+i+'" onclick="return showPhotos('+i+')">展開</a> · <a href="#" onclick="return zipBrand('+i+',this)">'+ICON+'打包下載</a>':'')+'</div>'+
   '<div class="thumbs" id="ph-'+i+'"></div>'+
-  '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';}
+  '<div style="text-align:right;margin-top:10px"><a href="#" onclick="return resetPw('+i+')" style="font-size:11px;color:var(--ink-mid);margin-right:12px">重設密碼</a><a href="#" onclick="return delBrand('+i+')" style="font-size:11px;color:var(--blush)">刪除此品牌</a></div></div>';}
 function renderBrands(code){var rows=code?ROWS.filter(function(r){return r.eventCode===code;}):ROWS;var h='';
   if(!ROWS.length)h='<div class="card meta">目前還沒有品牌登記。</div>';
   else if(!rows.length)h='<div class="card meta">此活動沒有品牌。</div>';
@@ -141,6 +141,18 @@ function delEvent(code){
   rpc('booth_admin_event_delete',{admin_password:PW,p_code:code}).then(function(r){
     if(!r||!r.ok){alert((r&&r.error)||'刪除失敗');return;}
     loadEvents();
+  });
+  return false;
+}
+function resetPw(i){
+  var r=ROWS[i]; if(!r)return false;
+  var np=prompt('重設「'+r.brand+'」的登入密碼。\n請先確認是本人再重設。\n\n新密碼（可直接用下面預設）：','sg'+(1000+Math.floor(Math.random()*9000)));
+  if(!np)return false;
+  var pw=prompt('請再次輸入管理密碼確認：');
+  if(!pw)return false;
+  rpc('booth_admin_reset_password',{admin_password:pw,p_email:r.email,p_new_password:np}).then(function(res){
+    if(!res||!res.ok){alert((res&&res.error)||'重設失敗');return;}
+    alert('已將「'+r.brand+'」的密碼重設為：\n\n'+np+'\n\n請轉告該品牌，並提醒登入後可自行修改。');
   });
   return false;
 }
