@@ -17,7 +17,7 @@
   .btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;background:var(--ink);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:12px;}
   .msg{font-size:12px;color:var(--blush);margin-top:8px;}
   .sum{font-size:13px;}
-  .atabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-m);border-radius:7px;overflow:hidden;margin-bottom:14px;}
+  .atabs{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border-m);border-radius:7px;overflow:hidden;margin-bottom:14px;}
   .atab{padding:9px;border:none;background:var(--cream);font-family:inherit;font-size:13px;color:var(--ink-soft);cursor:pointer;border-right:1px solid var(--border-m);}
   .atab:last-child{border-right:none;}
   .atab.on{background:var(--ink);color:var(--cream);font-weight:500;}
@@ -40,13 +40,9 @@
   .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.94);color:var(--ink);font-size:23px;line-height:37px;text-align:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.22);user-select:none;}
   .lb-prev{left:-14px;} .lb-next{right:-14px;}
   .lb-count{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;}
-  details.guide summary{cursor:pointer;list-style:none;position:relative;padding-right:22px;font-size:14px;font-weight:500;color:var(--ink);}
-  details.guide summary::-webkit-details-marker{display:none;}
-  details.guide summary::after{content:'＋';position:absolute;right:2px;top:-1px;color:var(--ink-soft);}
-  details.guide[open] summary::after{content:'－';}
-  details.guide .gbody{font-size:12.5px;line-height:1.9;color:var(--ink-mid);margin-top:12px;}
-  details.guide .gbody b{color:var(--ink);}
-  details.guide .gbody .sec{margin-top:12px;}
+  .guide .gbody{font-size:12.5px;line-height:1.9;color:var(--ink-mid);}
+  .guide .gbody b{color:var(--ink);}
+  .guide .gbody .sec{margin-top:12px;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
@@ -78,13 +74,23 @@ function render(res){
   var codes=[]; ROWS.forEach(function(r){if(r.eventCode&&codes.indexOf(r.eventCode)<0)codes.push(r.eventCode);});
   var fopts='<option value="">全部活動（'+ROWS.length+'）</option>'+codes.map(function(c){var n=ROWS.filter(function(r){return r.eventCode===c;}).length;return '<option value="'+esc(c)+'">'+esc(c)+'（'+n+'）</option>';}).join('');
   var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><a href="index.html" style="font-size:12px;color:var(--ink-mid);text-decoration:none">← 返回主頁</a><button onclick="logout()" style="font-size:12px;padding:6px 13px;border:1px solid var(--border-m);border-radius:6px;background:var(--cream);color:var(--ink-mid);cursor:pointer;font-family:inherit">登出</button></div>'
-    +'<div class="atabs"><button class="atab on" id="atab-b" onclick="aTab(\'b\')">品牌資料</button><button class="atab" id="atab-s" onclick="aTab(\'s\')">活動與設定</button></div>'
+    +'<div class="atabs"><button class="atab on" id="atab-b" onclick="aTab(\'b\')">品牌資料</button><button class="atab" id="atab-s" onclick="aTab(\'s\')">活動與設定</button><button class="atab" id="atab-g" onclick="aTab(\'g\')">操作說明</button></div>'
     +'<div id="pane-b">'
     +'<div class="card sum"><b>共 '+ROWS.length+' 家</b> · 需水源 <b>'+water+'</b> · 需額外電力 <b>'+power+'</b>'+(ROWS.length?'<button onclick="zipAll(this)" style="display:block;margin-top:10px;font-size:12px;padding:9px 14px;border:1px solid var(--sage);border-radius:7px;background:var(--sage-bg);color:#3F6B3D;cursor:pointer;font-family:inherit">'+ICON+'打包全部品牌照片</button>':'')+'</div>'
     +(ROWS.length?'<label style="margin-bottom:4px">依活動篩選</label><select id="ev-filter" onchange="renderBrands(this.value)" style="margin-bottom:12px">'+fopts+'</select>':'')
     +'<div id="brand-list"></div></div>'
     +'<div id="pane-s" style="display:none">'
-    +'<details class="card guide"><summary>操作說明（點此展開）</summary><div class="gbody">'
+    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">活動管理</div><div id="ev-list" class="meta">載入中…</div>'
+    +'<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="ev-code" placeholder="活動代碼"><input id="ev-name" placeholder="活動名稱"></div>'
+    +'<label style="margin-top:8px">資料上傳期限</label><input id="ev-deadline" type="date">'
+    +'<button class="btn" onclick="saveEvent()">新增 / 更新活動</button><div class="msg" id="ev-msg"></div></div></div>'
+    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">全域設定</div>'
+    +'<label>每家可上傳照片張數</label><input id="set-limit" type="number" min="1" max="20">'
+    +'<label style="margin-top:8px">照片壓縮模式</label><select id="set-mode"><option value="print">高畫質（印刷／原圖級）</option><option value="a4">標準（A4 文宣）</option><option value="social">輕量（社群媒體）</option></select>'
+    +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div></div>'
+    +'<div id="pane-g" style="display:none">'
+    +'<div class="card guide"><div class="gbody" style="margin-top:0">'
     +'<div><b>品牌資料分頁</b></div>'
     +'・上方統計列可一鍵「打包全部品牌照片」下載。<br>'
     +'・「依活動篩選」只看某一場活動的品牌。<br>'
@@ -98,21 +104,12 @@ function render(res){
     +'3. 再輸入一次管理密碼確認。<br>'
     +'4. 把新密碼轉告品牌，請他登入後到頁面最下方自行修改。'
     +'<div class="sec" style="color:var(--ink-soft)">※ 密碼一律加密儲存、<b style="color:var(--ink-soft)">無法還原</b>；忘記只能「重設」一組新的，無法查回原本的。這是為了保護品牌隱私。</div>'
-    +'</div></details>'
-    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">活動管理</div><div id="ev-list" class="meta">載入中…</div>'
-    +'<div style="border-top:1px solid var(--border);margin-top:10px;padding-top:10px">'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input id="ev-code" placeholder="活動代碼"><input id="ev-name" placeholder="活動名稱"></div>'
-    +'<label style="margin-top:8px">資料上傳期限</label><input id="ev-deadline" type="date">'
-    +'<button class="btn" onclick="saveEvent()">新增 / 更新活動</button><div class="msg" id="ev-msg"></div></div></div>'
-    +'<div class="card"><div style="font-size:14px;font-weight:500;margin-bottom:8px">全域設定</div>'
-    +'<label>每家可上傳照片張數</label><input id="set-limit" type="number" min="1" max="20">'
-    +'<label style="margin-top:8px">照片壓縮模式</label><select id="set-mode"><option value="print">高畫質（印刷／原圖級）</option><option value="a4">標準（A4 文宣）</option><option value="social">輕量（社群媒體）</option></select>'
-    +'<button class="btn" onclick="saveSettings()">儲存設定</button><div class="msg" id="set-msg"></div></div></div>';
+    +'</div></div></div>';
   $('panel').innerHTML=h;
   renderBrands('');
   loadEvents(); loadSettings();
 }
-function aTab(w){var b=w==='b';$('atab-b').classList.toggle('on',b);$('atab-s').classList.toggle('on',!b);$('pane-b').style.display=b?'block':'none';$('pane-s').style.display=b?'none':'block';}
+function aTab(w){['b','s','g'].forEach(function(k){$('atab-'+k).classList.toggle('on',k===w);$('pane-'+k).style.display=k===w?'block':'none';});}
 function brandCard(r,i){return '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><span class="bn">'+esc(r.brand)+'</span><span class="meta">更新 '+esc(r.updated)+'</span></div>'+
   '<div class="meta">'+esc(r.contact)+' · '+esc(r.email)+(r.phone?' · '+esc(r.phone):'')+'</div>'+
   '<div class="meta">活動：'+esc(r.eventCode||'-')+'</div>'+
